@@ -19,17 +19,17 @@ class Reword(db.Model):
 
 @app.route('/')
 def hello_world():
-    data = Reword.query.all();
-    return render_template('index.html',date=data)
+    data = Reword.query.all()
+    return render_template('register_rewords/index.html',data=data)
 
 
 @app.route('/add', methods=['POST'])
 def add():
     reword_text = request.form['reword']
-    new_reword = Reword(reword=reword_text)
+    new_reword = Reword(name = reword_text)
     db.session.add(new_reword)
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect("/")
 
 
 if __name__ == '__main__':

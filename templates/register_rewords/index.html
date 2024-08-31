@@ -9,11 +9,11 @@
 <body>
     <h1>index.html表示してます</h1>
     <form action="/add" method="POST">
-        <input type="text" name="reword" placeholder="ご褒美タイム～～～～"/>
+        <input type="text" name="reword" placeholder="なまくり～む"/>
         <input type="submit" value="Add"/>
         <br>
 		{% for d in data %}
-			<p>{{d.id}} : {{d.todo}}</p>
+			<p>{{d.id}} : {{d.name}}</p>
 		{% endfor %}
     </form>
 </body>
