@@ -16,7 +16,6 @@ class Reword(db.Model):
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(200))
 
-
 @app.route('/')
 def hello_world():
     data = Reword.query.all()
