@@ -1,20 +1,49 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>テストWebアプリ</title>
 </head>
+
 <body>
     <h1>index.html表示してます</h1>
     <form action="/add" method="POST">
-        <input type="text" name="reword" placeholder="なまくり～む"/>
-        <input type="submit" value="Add"/>
-        <br>
-		{% for d in data %}
-			<p>{{d.id}} : {{d.name}}</p>
-		{% endfor %}
+        <input type="text" name="reword" placeholder="なまくり～む" />
+        <input type="checkbox" id="big_reword" name="reword_kind" placeholder="なまくり～む" />
+        <label for="big_reword">
+            大きなご褒美
+        </label>
+        <button type="submit" class="btn btn-info">追加</button>
+        <a href="http://127.0.0.1:5000/">
+            <button type="button" class="btn btn-danger">back</button></a>
+            
+        <div>
+            {% for data in small_reword %}
+            {{data.id}}: {{data.name}}
+            {% endfor %}
+        </div>
+        <div>
+            {% for data in big_reword %}
+            {{data.id}}: {{data.name}}
+            {% endfor %}
+        </div>
+    </form>
+
+    <form action="/update" method="POST">
+        <input type="text" name="id" placeholder="更新したいID" />
+        <input type="text" name="reword" placeholder="なまくり～む" />
+        <button type="submit" class="btn btn-info">更新</button>
+    </form>
+
+    <form action="/delete" method="POST">
+        <input type="text" name="id" placeholder="削除したいID" />
+        <button type="submit" class="btn btn-info">削除</button>
     </form>
 </body>
+
 </html>
