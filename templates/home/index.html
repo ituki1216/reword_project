@@ -102,13 +102,8 @@
         }
 
         function displayRewards(points) {
-            const smallRewards = [
-                'チョコレート:', 'かっぱえびせん', 'じゃがりこ',
-                'ハーゲンダッツ', 'ピザポテト', '肩揚げポテト'
-            ];
-            const largeRewards = [
-                'ゲーム', '散歩', 'パチンコ', 'お菓子爆食い', '温泉', 'ご飯行く'
-            ];
+            let smallRewards = "{{small_reword | tojson }}"
+            const largeRewards = {{big_reword | tojson}}
 
             const smallRewardList = document.getElementById('smallReward');
             const largeRewardList = document.getElementById('largeReward');

@@ -24,8 +24,16 @@ def hello_world():
     return render_template('register_rewords/index.html',small_reword=small_reword, big_reword=big_reword)
 
 @app.route('/')
-def Home():
-    return render_template('home/index.html')
+def Home(): #
+    small_reword_arr = []
+    big_reword_arr = []
+    small_reword = Reword.query.filter(Reword.reword_kind == 0)
+    for data in small_reword:
+        small_reword_arr.append(data.name)
+    big_reword = Reword.query.filter(Reword.reword_kind == 1)
+    for data in big_reword:
+        big_reword_arr.append(data.name)
+    return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr)
 
 @app.route('/delete', methods=['POST'])
 def delete():
@@ -44,7 +52,7 @@ def update():
     db.session.commit()
     return redirect("/add")
 
-@app.route('/add', methods=['POST'])
+@app.route('/', methods=['POST'])
 def add():
     reword_kind = False
     print(request.form)
