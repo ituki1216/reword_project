@@ -5,10 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ウハウハご褒美タイム</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-light">
+    <style>
+        body {
+            background-image: url("/static/images/reword.jpg");
+            background-size: cover;
+        }
+    </style>
     <div class="container my-5">
         <h1 class="text-center mb-4 text-primary">ウハウハご褒美タイム</h1>
 

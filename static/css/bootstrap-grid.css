@@ -1,0 +1,8 @@
+body {
+    background-image: url('images/your-background.jpg'); /* 画像ファイルのパスを指定 */
+    background-size: cover; /* 背景画像を全画面で表示 */
+    background-position: center; /* 背景画像を中央に配置 */
+    background-repeat: no-repeat; /* 背景画像を繰り返さない */
+    background-attachment: fixed; /* 背景画像をスクロールに固定 */
+    opacity: 0.5; /* 背景の透明度を設定（必要に応じて） */
+}

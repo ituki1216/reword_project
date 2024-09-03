@@ -24,7 +24,7 @@ def hello_world():
     return render_template('register_rewords/index.html',small_reword=small_reword, big_reword=big_reword)
 
 @app.route('/')
-def Home(): #
+def Home(): #zz
     small_reword_arr = []
     big_reword_arr = []
     small_reword = Reword.query.filter(Reword.reword_kind == 0)
