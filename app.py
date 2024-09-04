@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ class Reword(db.Model):
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 @app.route('/add', methods=['GET'])
 def hello_world():
@@ -32,7 +34,7 @@ def Home(): #zz
         small_reword_arr.append(data.name)
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
-        big_reword_arr.append(data.name)
+        big_reword_arr.append('name': data.name, 'timestamp': data.timestamp)
     return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr)
 
 @app.route('/delete', methods=['POST'])
