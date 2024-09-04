@@ -109,7 +109,8 @@
         }
 
         function displayRewards(points) {
-            let smallRewards = small_reword
+            var small_reword_arr = JSON.parse("{{small_reword_arr|safe}}")
+            console.log(small_reword_arr);
             let largeRewards = big_reword  
 
             const smallRewardList = document.getElementById('smallReward');

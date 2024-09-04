@@ -24,12 +24,12 @@
             
         <div>
             {% for data in small_reword %}
-            {{data.id}}: {{data.name}}: {{ item['timestamp'] }}
+            {{data.id}}: {{data.name}}: 
             {% endfor %}
         </div>
         <div>
             {% for data in big_reword %} 
-            {{data.id}}: {{data.name}}: {{ item['timestamp'] }}
+            {{data.id}}: {{data.name}}: 
             {% endfor %}
         </div>
     </form>
@@ -42,7 +42,7 @@
 
     <form action="/delete" method="POST">
         <input type="text" name="id" placeholder="削除したいID" />
-        <button type="submit" class="btn btn-info">削除</button>
+        <button type="submit" class="btn btn-danger">削除</button>
     </form>
 </body>
 
