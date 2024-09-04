@@ -81,14 +81,25 @@ def Home(): # ユーザーに見せるホームページにまつわる関数
         big_reword_arr.append({'name': data.name, 'timestamp': data.timestamp}) # 上に同じ大きなご褒美を取得する
     return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr, double_point_day=double_point_day) # strftime('%A, %B %d, %Y')) 今日が2倍point dayならtopページに表示を行う
 
+@app.route('/', methods=['POST']) # ユーザーからpostされたデータをrewordに追加
+def add():
+    reword_kind = False # reword_kindの変数を初期化
+    print(request.form) # 弟馬具用
+    if  request.form.get('reword_kind'): # もしれクエストがreword_kindならTRUE 大きなご褒美とする
+        reword_kind = True
+    reword_text = request.form['reword'] # rewordの名前はformのrewordを参照
+    new_reword = Reword(name = reword_text, reword_kind = reword_kind) # Userから受け取ったrewordの名前、種類はそれぞれreword_text, rewird_kindとする)
+    db.session.add(new_reword) # 追加されたrewordをデータベースに追加し
+    db.session.commit() # commitする
+    return redirect("/add") # Userにはadd画面に戻ってもらう
+    
 @app.route('/add', methods=['GET'])
 def hello_world(): # /addにUserがアクセスしたときに以下の関数が実行される
     small_reword = Reword.query.filter(Reword.reword_kind == 0) # rewordというテーブルから条件にあうrewordを取得(reword == 0)
     big_reword = Reword.query.filter(Reword.reword_kind == 1) # rewordのクエリーの条件検索(reword == 1)を取得
     return render_template('register_rewords/index.html',small_reword=small_reword, big_reword=big_reword) # topページに返すとともに small_reword=small_reword, big_reword=big_rewordデータをわたす
     
-
-@app.route('/delete', methods=['POST'])
+@app.route('/delete', methods=['POST']) 
 def delete():
     id = request.form["id"]
     record_to_delete = Reword.query.filter_by(id=id).first()
@@ -104,19 +115,6 @@ def update():
     reword.name = name
     db.session.commit()
     return redirect("/add")
-
-@app.route('/', methods=['POST'])
-def add():
-    reword_kind = False
-    print(request.form)
-    if  request.form.get('reword_kind'):
-        reword_kind = True
-    reword_text = request.form['reword']
-    new_reword = Reword(name = reword_text, reword_kind = reword_kind)
-    db.session.add(new_reword)
-    db.session.commit()
-    return redirect("/add")
-
 
 if __name__ == '__main__':
     app.run(debug=True)
