@@ -19,54 +19,8 @@ class Reword(db.Model): # データベースの作成
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow) # エラーなぜ？
-    start_week = db.Column(db.DateTime, nullable=False) 
-    double_point_day = db.Column(db.DateTime, nullable=False)
+   
 
-
-# 特定の週の開始日にポイントを２倍にして、データベースに取得、保存
-# 週に開始日時を取得
-today = datetime.uncnow() # 現在の日時を取得
-start_week = get_start_week(today)) # 今日が属している州の始まりを取得
-# ランダムで2倍の日を取得
-double_point_day = datermine_double_point_day(start_week) 
-
-# 一週間の始まりを㈪とする
-def get_start_week(date) # dateを引数とて受け取り週の始まりを計算
-    start = date - timedelta(days=date. weekday()) # 現在の日付からその日が週の何日目かを計算(-)して始まりを計算
-    return start # 計算した週の開始日を返す
-
-#　ランダムでポイント2倍dayを決定
-def double_point_day(start_week)
-    random_double_day = random.randint(0, 6) # 一週間のうランダムに2倍の火を7日間の中から決定
-    return start_week + timedelta(days=random_double_day) #週の初めにランダムな日を返す 
-
-def set_double_point_day(): # 今日の日付をもとに、その週の２倍の火を取得 else設定
-    today = datetime.uncnow() # 現在の日付を取得
-    start_week = get_start_week(today) # 現在の日付をもとに今日が属する週の初めを取得 
-    weekly_config = Weekly.Config.query.filter_by(start_week=start_week).first() # その週の規定が存在するか否かfilter(検索)
-    if weekly_config: # もしあれば
-          return weekly_config.double_point_day # その週を２倍に
-    else: # もしなければ
-        double_point_day = datermine_double_point_day(start_week) #週の開始日をもとにランダムな２倍dayを設定し直す
-        new_weekly_config = WeeklyConfing(start_week=start_week, double_point_day=double_point_day) #現在の週の設定がデータベースにあるか確認し、なければ設定をつくる
-        db.session.add(new_weekly_config) # 作った設定をデータベースに追加
-        db.session.commit() # dbにコミット
-        return double_point_day # double_point_dayを出力
-        
-#勉強時間に基づいて計算
-def calculate_points(study_minute): 
-    today = datetime.utcnow() #本日の日付を取得
-    double_point_day = set_or_get_double_point_day() # 今週のポイント2倍dayを取得
-    point = study_minute  # 勉強時間に基づくポイント（1分あたり1ポイント
-    if today.date() == double_point_day.date(): # もし今日がポイント2倍dayならpoint=*2
-        point *= 2
-    return point
-
-# テスト
-study_minute = 1234  # 例えば、120分勉強した場合
-point = calculate_point(study_minute)
-print(f"取得ポイント: {point}")
 
 @app.route('/') # toppageにアクセスされたときにHome関数を実行するよ！！！あは！ (現在時刻2024/09/04/15:23:35) はーむずすぎてちぬ
 def Home(): # ユーザーに見せるホームページにまつわる関数
@@ -78,8 +32,8 @@ def Home(): # ユーザーに見せるホームページにまつわる関数
         small_reword_arr.append({'name':data.name, 'timestamp': data.timestamp}) # 小さなご褒美をデータベースから取得する
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
-        big_reword_arr.append({'name': data.name, 'timestamp': data.timestamp}) # 上に同じ大きなご褒美を取得する
-    return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr, double_point_day=double_point_day) # strftime('%A, %B %d, %Y')) 今日が2倍point dayならtopページに表示を行う
+        big_reword_arr.append(data.name) # 上に同じ大きなご褒美を取得する
+    return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr) # strftime('%A, %B %d, %Y')) 今日が2倍point dayならtopページに表示を行う
 
 @app.route('/', methods=['POST']) # ユーザーからpostされたデータをrewordに追加
 def add():
