@@ -5,152 +5,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ウハウハご褒美タイム</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-light">
-<style>
-    body {
-        background-image: url("/static/images/reword.jpg");
-        background-size: cover;
-    }
-</style>
-<div class="container my-5">
-    <h1 class="text-center mb-4 text-primary">ウハウハご褒美タイム</h1>
+    <style>
+        body {
+            background-image: url("/static/images/reword.jpg");
+            background-size: cover;
+        }
+    </style>
+    <div class="container my-5">
+        <h1 class="text-center mb-4 text-primary">ウハウハご褒美タイム</h1>
 
-    <div class="card border-info mx-auto mb-4" style="max-width: 600px;">
-        <div class="card-header text-center bg-info text-white">
-            今日の勉強ポイントを計算しよう
-        </div>
-        <div class="card-body">
-            <div id="studyTimeContainer" class="mb-4">
-                <label for="studyTime" class="form-label text-info">今日の勉強時間 (分)</label>
-                <input type="text" class="form-control border-info" id="studyTime" readonly>
+        <div class="card border-info mx-auto mb-4" style="max-width: 600px;">
+            <div class="card-header text-center bg-info text-white">
+                今日の勉強ポイントを計算しよう
             </div>
-
-            <div class="mb-4">
-                <button class="btn btn-info w-100" onclick="calculatePoints()">ポイントを計算する</button>
-            </div>
-
-            <div class="text-center">
-                <div class="display-6 text-success mb-2">
-                    今日の獲得ポイント: <span id="todayPoints">0</span> pt
+            <div class="card-body">
+                <div id="studyTimeContainer" class="mb-4">
+                    <label for="studyTime" class="form-label text-info">今日の勉強時間 (分)</label>
+                    <input type="text" class="form-control border-info" id="studyTime" readonly>
                 </div>
-                <div class="display-6 text-warning">
-                    総合獲得ポイント: <span id="totalPoints">0</span> pt
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card border-success mb-4">
-                <div class="card-header text-center bg-success text-white">
-                    小さなご褒美
+                <div class="mb-4">
+                    <button class="btn btn-info w-100" onclick="calculatePoints()">ポイントを計算する</button>
                 </div>
-                <div class="card-body">
-                    <div id="smallReward" class="list-group">
-                        <div class="list-group-item text-center">ポイントを計算してご褒美をゲット！</div>
+
+                <div class="text-center">
+                    <div class="display-6 text-success mb-2">
+                        今日の獲得ポイント: <span id="todayPoints">0</span> pt
+                    </div>
+                    <div class="display-6 text-warning">
+                        総合獲得ポイント: <span id="totalPoints">0</span> pt
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card border-warning mb-4">
-                <div class="card-header text-center bg-warning text-white">
-                    大きなご褒美
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-success mb-4">
+                    <div class="card-header text-center bg-success text-white">
+                        小さなご褒美
+                    </div>
+                    <div class="card-body">
+                        <div id="smallReward" class="list-group">
+                            <div class="list-group-item text-center">ポイントを計算してご褒美をゲット！</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div id="largeReward" class="list-group">
-                        <div class="list-group-item text-center">ポイントを貯めて大きなご褒美をゲット！</div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-warning mb-4">
+                    <div class="card-header text-center bg-warning text-white">
+                        大きなご褒美
+                    </div>
+                    <div class="card-body">
+                        <div id="largeReward" class="list-group">
+                            <div class="list-group-item text-center">ポイントを貯めて大きなご褒美をゲット！</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <a href="http://127.0.0.1:5000/add">
-        <div class="mb-3">
-            <button class="btn btn-danger col-12 text-white mgtext-center" type="button">追加</button>
-        </div>
-    </a>
-    <button onclick="displayRewards()"></button>
+        <a href="http://127.0.0.1:5000/add">
+        <div class="mb-3"><button class="btn btn-danger col-12 text-white mgtext-center" type="button">追加</button></div></a>
 
-    <div class="card border-primary">
-        <div class="card-header text-center bg-primary text-white">
-            目標に向かって頑張ろう！
-        </div>
-        <div class="card-body text-center">
-            <p class="mb-0">1週間の目標時間: <strong>300分</strong></p>
-            <p>進捗状況: <span class="text-primary">120分</span> / 300分</p>
+
+        <div class="card border-primary">
+            <div class="card-header text-center bg-primary text-white">
+                目標に向かって頑張ろう！
+            </div>
+            <div class="card-body text-center">
+                <p class="mb-0">1週間の目標時間: <strong>300分</strong></p>
+                <p>進捗状況: <span class="text-primary">120分</span> / 300分</p>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    // 仮にバックエンドから勉強時間を取得する関数
-    function fetchStudyTime() {
-        return 90; // 例として90分とする
-    }
+    <script>
+        // 仮にバックエンドから勉強時間を取得する関数
+        function fetchStudyTime() {
+            return 90; // 例として90分とする
+        }
 
-    // 仮にバックエンドから総合ポイントを取得する関数
-    function fetchTotalPoints() {
-        return 1200; // 例として1200ポイントとする
-    }
+        // 仮にバックエンドから総合ポイントを取得する関数
+        function fetchTotalPoints() {
+            return 1200; // 例として1200ポイントとする
+        }
 
-     async function calculatePoints() {
-        const studyTime = fetchStudyTime();
-        const todayPoints = studyTime ? parseInt(studyTime) : 0;
-        const totalPoints = fetchTotalPoints() + todayPoints;
+        function calculatePoints() {
+            const studyTime = fetchStudyTime();
+            const todayPoints = studyTime ? parseInt(studyTime) : 0;
+            const totalPoints = fetchTotalPoints() + todayPoints;
 
-        document.getElementById('studyTime').value = studyTime;
-        document.getElementById('totalPoints').innerText = totalPoints;
-        await displayRewards(60);
-    }
+            document.getElementById('studyTime').value = studyTime;
+            document.getElementById('todayPoints').innerText = todayPoints;
+            document.getElementById('totalPoints').innerText = totalPoints;
 
+            displayRewards(todayPoints);
+        }
 
-    async function fetchSmallReword() {
-        const response = await fetch('/small_reword');
-        return await response.json();
-    }
+        function displayRewards(points) {
+            var small_reword_arr = JSON.parse("{{small_reword_arr|safe}}")
+            console.log(small_reword_arr);
+            let largeRewards = big_reword  
 
-
-    let fetchBigReword = async () => {
-        const response = await fetch('/big_reword');
-        return await response.json();
-    }
-
-    async function displayRewards(points) {
-        fetchSmallReword().then(smallRewards => {
             const smallRewardList = document.getElementById('smallReward');
+            const largeRewardList = document.getElementById('largeReward');
+
             smallRewardList.innerHTML = '';
+            largeRewardList.innerHTML = '';
 
             // 小さなご褒美の表示
             if (points >= 60) {
                 const randomSmallReward = smallRewards[Math.floor(Math.random() * smallRewards.length)];
                 smallRewardList.innerHTML += `<div class="list-group-item text-center">${randomSmallReward}</div>`;
             }
-        });
-        fetchBigReword().then(largeRewords => {
-            const largeRewardList = document.getElementById('largeReward');
-            largeRewardList.innerHTML = '';
 
             // 大きなご褒美の表示
-            if (points >= 200) {
-                const randomLargeReward = largeRewords[Math.floor(Math.random() * largeRewords.length)];
+            if (points >= 60) {
+                const randomLargeReward = largeRewards[Math.floor(Math.random() * largeRewards.length)];
                 largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
             }
+        }
+
+        // ページ読み込み時に自動的にポイントを計算
+        document.addEventListener('DOMContentLoaded', () => {
+            calculatePoints();
         });
-    }
+    </script>
 
-    // ページ読み込み時に自動的にポイントを計算
-    document.addEventListener('DOMContentLoaded', (async) => {
-        calculatePoints();
-    });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
