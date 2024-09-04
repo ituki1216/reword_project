@@ -19,6 +19,7 @@ class Reword(db.Model): # データベースの作成
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
+<<<<<<< HEAD
     timestamp = db.Column(db.DateTime, default=datetime.utcnow) # エラーなぜ？
     start_week = db.Column(db.DateTime, nullable=False) 
     double_point_day = db.Column(db.DateTime, nullable=False)
@@ -68,6 +69,11 @@ study_minute = 1234  # 例えば、120分勉強した場合
 point = calculate_point(study_minute)
 print(f"取得ポイント: {point}")
 
+=======
+   
+
+
+>>>>>>> ef898c06fc52f2fe64356e86b2dae5a650ff8c7e
 @app.route('/') # toppageにアクセスされたときにHome関数を実行するよ！！！あは！ (現在時刻2024/09/04/15:23:35) はーむずすぎてちぬ
 def Home(): # ユーザーに見せるホームページにまつわる関数
     double_point_day = set_or_get_double_point_day() # ポイント２倍dayを設定
@@ -78,8 +84,13 @@ def Home(): # ユーザーに見せるホームページにまつわる関数
         small_reword_arr.append({'name':data.name, 'timestamp': data.timestamp}) # 小さなご褒美をデータベースから取得する
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
+<<<<<<< HEAD
         big_reword_arr.append({'name': data.name, 'timestamp': data.timestamp}) # 上に同じ大きなご褒美を取得する
     return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr, double_point_day=double_point_day) # strftime('%A, %B %d, %Y')) 今日が2倍point dayならtopページに表示を行う
+=======
+        big_reword_arr.append(data.name) # 上に同じ大きなご褒美を取得する
+    return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr) # strftime('%A, %B %d, %Y')) 今日が2倍point dayならtopページに表示を行う
+>>>>>>> ef898c06fc52f2fe64356e86b2dae5a650ff8c7e
 
 @app.route('/', methods=['POST']) # ユーザーからpostされたデータをrewordに追加
 def add():
