@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, 
 from datetime import datetime
+from datetime import deltatime
+import random
+
 
 
 app = Flask(__name__)
@@ -17,7 +20,18 @@ class Reword(db.Model):
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow) # エラーなぜ？
+    start_of_week = db.Column(db.DateTime, nullable=False)
+    double_points_day = db.Column(db.DateTime, nullable=False)
+
+# 一週間の始まりを月日とする
+def get_start_week(date)
+    start = date - timedelta(days=date. weekday())
+
+#　ランダムでポイント2倍dayを決定
+def double_point_day(start_week)
+    random_double_day = random.randint(0, 6) # 一週間のうランダムに２倍の火を６日間の中から決定
+    return start_week + timedelta(days=random_double_day)
 
 @app.route('/add', methods=['GET'])
 def hello_world():
