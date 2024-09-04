@@ -24,12 +24,12 @@
             
         <div>
             {% for data in small_reword %}
-            {{data.id}}: {{data.name}}
+            {{data.id}}: {{data.name}}: {{ item['timestamp'] }}
             {% endfor %}
         </div>
         <div>
             {% for data in big_reword %} 
-            {{data.id}}: {{data.name}}
+            {{data.id}}: {{data.name}}: {{ item['timestamp'] }}
             {% endfor %}
         </div>
     </form>
