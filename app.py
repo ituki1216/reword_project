@@ -18,7 +18,7 @@ class Reword(db.Model):
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
 
-
+print("unti")
 @app.route('/small_reword')
 def small_reword_data():
     small_reword_arr = []
