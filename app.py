@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask import jsonify
 import json
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
@@ -19,23 +19,37 @@ class Reword(db.Model):
     description = db.Column(db.String(200))
 
 
-@app.route('/')
-def Home(): 
+
+def small_reword_data():
     small_reword_arr = []
-    big_reword_arr = []
     small_reword = Reword.query.filter(Reword.reword_kind == 0)
     for data in small_reword:
         small_reword_arr.append(data.name)
-    big_reword = Reword.query.filter(Reword.reword_kind == 1) 
+
+    return jsonify(small_reword_arr)
+
+
+@app.route('/big_reword')
+def big_reword_data():
+    big_reword_arr = []
+    big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr)
+
+    return jsonify(big_reword_arr)
+
+
+@app.route('/')
+def Home():
+    return render_template('home/index.html')
+
 
 @app.route('/add', methods=['GET'])
 def hello_world():
     small_reword = Reword.query.filter(Reword.reword_kind == 0)
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
-    return render_template('register_rewords/index.html',small_reword=small_reword, big_reword=big_reword)
+    return render_template('register_rewords/index.html', small_reword=small_reword, big_reword=big_reword)
+
 
 @app.route('/update', methods=['POST'])
 def update():
@@ -46,6 +60,7 @@ def update():
     db.session.commit()
     return redirect("/add")
 
+
 @app.route('/delete', methods=['POST'])
 def delete():
     id = request.form["id"]
@@ -55,15 +70,14 @@ def delete():
     return redirect("/add")
 
 
-
 @app.route('/create', methods=['POST'])
 def add():
     reword_kind = False
     print(request.form)
-    if  request.form.get('reword_kind'):
+    if request.form.get('reword_kind'):
         reword_kind = True
     reword_text = request.form['reword']
-    new_reword = Reword(name = reword_text, reword_kind = reword_kind)
+    new_reword = Reword(name=reword_text, reword_kind=reword_kind)
     db.session.add(new_reword)
     db.session.commit()
     return redirect("/add")
