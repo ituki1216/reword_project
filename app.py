@@ -19,7 +19,7 @@ class Reword(db.Model):
     description = db.Column(db.String(200))
 
 
-@app.route('/small_reword')
+
 def small_reword_data():
     small_reword_arr = []
     small_reword = Reword.query.filter(Reword.reword_kind == 0)

@@ -108,12 +108,13 @@
         document.getElementById('totalPoints').innerText = totalPoints;
         await displayRewards(60);
     }
-
-
+  
+  
     async function fetchSmallReword() {
         const response = await fetch('/small_reword');
         return await response.json();
     }
+
 
 
     let fetchBigReword = async () => {
