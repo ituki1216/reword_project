@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from threads_api.src.threads_api import ThreadsAPI
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import json
@@ -17,6 +18,7 @@ class Reword(db.Model):
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
+
 
 @app.route('/')
 def Home(): 
