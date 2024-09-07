@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask import jsonify
 import json
 
 app = Flask(__name__)
@@ -18,30 +17,18 @@ class Reword(db.Model):
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
 
-print("unti")
-@app.route('/small_reword')
-def small_reword_data():
-    small_reword_arr = []
-    small_reword = Reword.query.filter(Reword.reword_kind == 0)
-    for data in small_reword:
-        small_reword_arr.append(data.name)
-
-    return jsonify(small_reword_arr)
-
-
-@app.route('/big_reword')
-def big_reword_data():
-    big_reword_arr = []
-    big_reword = Reword.query.filter(Reword.reword_kind == 1)
-    for data in big_reword:
-        big_reword_arr.append(data.name)
-
-    return jsonify(big_reword_arr)
-
 
 @app.route('/')
 def Home():
-    return render_template('home/index.html')
+    small_reword_arr = []
+    big_reword_arr = []
+    small_reword = Reword.query.filter(Reword.reword_kind == 0)
+    for data in small_reword:
+        small_reword_arr.append(data.name)
+    big_reword = Reword.query.filter(Reword.reword_kind == 1)
+    for data in big_reword:
+        big_reword_arr.append(data.name)
+    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr)
 
 
 @app.route('/add', methods=['GET'])
