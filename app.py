@@ -68,6 +68,10 @@ def add():
     db.session.commit()
     return redirect("/add")
 
+@app.route('/stopwatch')
+def stopwatch():
+    return render_template('register_rewords/stopwatch.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
