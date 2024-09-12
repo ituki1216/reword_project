@@ -15,12 +15,14 @@
             margin: 0;
             flex-direction: column;
         }
+
         h1 {
             color: #333;
             margin-bottom: 20px;
             font-size: 2.5em;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
+
         #time {
             font-size: 4em;
             margin: 20px;
@@ -29,10 +31,12 @@
             letter-spacing: 2px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .button-container {
             display: flex;
             gap: 10px;
         }
+
         button {
             font-size: 1.5em;
             padding: 10px 20px;
@@ -43,7 +47,7 @@
             color: white;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s, 
+            transition: background-color 0.3s,
             transform 0.2s;
         }
 
@@ -59,6 +63,7 @@
             height: 100px;
             object-fit: cover;
         }
+
         #points {
             font-size: 2em;
             margin-bottom: 20px;
@@ -68,112 +73,119 @@
             background-color: #0056b3;
             transform: scale(1.05);
         }
+
         button:active {
             transform: scale(0.95);
         }
+
         button:focus {
             outline: none;
         }
+
         button#stop {
             background-color: #dc3545;
         }
+
         button#stop:hover {
             background-color: #c82333;
         }
+
         button#reset {
             background-color: #28a745;
         }
+
         button#reset:hover {
             background-color: #218838;
         }
     </style>
 </head>
 <body>
-    <h1>ストップウォッチ</h1>
-    <div id="time">00:00:00</div>
-    <div class="button-container">
-        <button id="start" onclick="start()">start</button>
-        <button id="stop" onclick="stop()">stop</button>
-        <button id="reset" onclick="reset()">reset</button>
-    </div>
-    <div id="points">ポイント: 0</div>
+<h1>ストップウォッチ</h1>
+<div id="time">00:00:00</div>
+<div class="button-container">
+    <button id="start" onclick="start()">start</button>
+    <button id="stop" onclick="stop()">stop</button>
+    <button id="reset" onclick="reset()">reset</button>
+</div>
+<div id="points">ポイント: 0</div>
 
-    <script>
-        let timer = null;
-        let seconds = 0;
+<script>
+    let timer = null;
+    let seconds = 1;
 
-        function formatTime(seconds) {
-            let hours = Math.floor(seconds / 3600);
-            let minutes = Math.floor((seconds % 3600) / 60);
-            let secs = seconds % 60;
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    function formatTime(seconds) {
+        let hours = Math.floor(seconds / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        let secs = seconds % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // 猫画像を表示する
+    function showCat() {
+        const catContainer = document.getElementById('cat-container');
+        const img = document.createElement('img');
+        img.src = `https://natgeo.nikkeibp.co.jp/atcl/web/15/327803/021000043/ph_thumb.jpg/100/100?random=${Math.random()}`;  // ランダムな猫画像
+        img.className = 'cat';
+        catContainer.appendChild(img);  // 猫画像を追加
+    }
+
+    function updateTime() {
+        document.getElementById('time').textContent = formatTime(window.sessionStorage.getItem(['Time']));
+    }
+
+    function addPoints() {
+        fetch('/add_points', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('points').textContent = `ポイント: ${data.points}`;
+            })
+            .catch(error => console.error('ポイントの追加に失敗しました:', error));
+    }
+
+    function start() {
+        if (!timer) {
+            timer = setInterval(() => {
+                const sessionItem = window.sessionStorage.getItem(["Time"])
+                if (!sessionItem){
+                    window.sessionStorage.setItem(['Time'], [seconds])
+                } else {
+                    window.sessionStorage.setItem(['Time'], [seconds+parseInt(sessionItem)])
+                }
+                updateTime();
+                if (seconds % 60 === 0 && seconds !== 0) {
+                    addPoints(); // 1分ごとにポイントを加算
+                }
+            }, 1000);
         }
+    }
 
-        function addPoints() {
-            points++;
-            document.getElementById('points').textContent = `ポイント: ${points}`;
-            showCat();
-        }
+    function stop() {
+        clearInterval(timer);
+        timer = null;
+    }
 
-        // 猫画像を表示する
-        function showCat() {
-            const catContainer = document.getElementById('cat-container');
-            const img = document.createElement('img');
-            img.src = `https://natgeo.nikkeibp.co.jp/atcl/web/15/327803/021000043/ph_thumb.jpg/100/100?random=${Math.random()}`;  // ランダムな猫画像
-            img.className = 'cat';
-            catContainer.appendChild(img);  // 猫画像を追加
-        }
+    function reset() {
+        stop();
+        seconds = 1;
+        window.sessionStorage.clear()
+        updateTime();
+    }
 
-        function updateTime() {
-            document.getElementById('time').textContent = formatTime(seconds);
-        }
+    // 初期ポイントを取得して表示
+    function fetchPoints() {
+        fetch('/get_points')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('points').textContent = `ポイント: ${data.points}`;
+            })
+            .catch(error => console.error('ポイントの取得に失敗しました:', error));
+    }
 
-        function addPoints() {
-            fetch('/add_points', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
-                })
-                .catch(error => console.error('ポイントの追加に失敗しました:', error));
-        }
-
-        function start() {
-            if (!timer) {
-                timer = setInterval(() => {
-                    seconds++;
-                    updateTime();
-                    if (seconds % 60 === 0 && seconds !== 0) {
-                        addPoints(); // 1分ごとにポイントを加算
-                    }
-                }, 1000);
-            }
-        }
-
-        function stop() {
-            clearInterval(timer);
-            timer = null;
-        }
-
-        function reset() {
-            stop();
-            seconds = 0;
-            updateTime();
-        }
-
-        // 初期ポイントを取得して表示
-        function fetchPoints() {
-            fetch('/get_points')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
-                })
-                .catch(error => console.error('ポイントの取得に失敗しました:', error));
-        }
-
-        // ページ読み込み時にポイントを取得
-        window.onload = function() {
-            fetchPoints();
-        };
-    </script>
+    // ページ読み込み時にポイントを取得
+    window.onload = function () {
+        document.getElementById("time").textContent = formatTime(window.sessionStorage.getItem(['Time']))
+        fetchPoints();
+    };
+</script>
 </body>
 </html>

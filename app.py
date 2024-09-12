@@ -1,24 +1,25 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from datetime import timedelta
-from flask import Flask, jsonify, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 import json
+from datetime import timedelta
+
+from flask import Flask, jsonify, render_template
+from flask import request, redirect, session
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'timer'
-app.permanent_session_lifetime = timedelta(minutes=5) # -> 5分 #(days=5) -> 5日保存
+app.permanent_session_lifetime = timedelta(minutes=5)  # -> 5分 #(days=5) -> 5日保存
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-
 class UserPoints(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     points = db.Column(db.Integer, default=0)
+
 
 class Reword(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +27,9 @@ class Reword(db.Model):
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
 
+
 points = 0
+
 
 @app.route('/')
 def Home():
@@ -38,14 +41,15 @@ def Home():
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr,  points=UserPoints)
+    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr,
+                           points=UserPoints)
 
-@app.route("/", methods = ["GET"])
+
+@app.route("/", methods=["GET"])
 def test():
-    session.permanent = True  # <--- makes the permanent session
-    timer = request.form["timer"] #ユーザー情報を保存する
-    session["timer"] = timer #sessionにtimer情報を保存
-
+    session.permanent = True
+    timer = request.form["timer"]
+    session["timer"] = timer
 
 
 @app.route('/add_points', methods=['POST'])
@@ -106,6 +110,7 @@ def add():
     db.session.add(new_reword)
     db.session.commit()
     return redirect("/add")
+
 
 @app.route('/stopwatch')
 def stopwatch():
