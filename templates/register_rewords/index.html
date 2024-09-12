@@ -44,6 +44,36 @@
         <input type="text" name="id" placeholder="削除したいID" />
         <button type="submit" class="btn btn-danger">削除</button>
     </form>
+
+    <!-- 1分ごとにポイントを加算するためのJavaScript -->
+    <script>
+        // 現在のポイントを取得して表示する関数
+        function fetchPoints() {
+            fetch('/get_points')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = data.points;
+                })
+                .catch(error => console.error('ポイントの取得に失敗しました:', error));
+        }
+
+        // 1ポイントをサーバーに追加する関数
+        function addPoint() {
+            fetch('/add_point', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = data.points;
+                })
+                .catch(error => console.error('ポイントの追加に失敗しました:', error));
+        }
+
+        // ページロード時にポイントを表示し、1分ごとにポイントを加算
+        window.onload = function() {
+            fetchPoints();  // 初回ロード時にポイントを取得
+            setInterval(addPoint, 60000);  // 1分ごとにポイントを加算
+        }
+    </script>
+
 </body>
 
 </html>

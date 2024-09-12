@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import json
@@ -17,7 +18,7 @@ class Reword(db.Model):
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
 
-
+points = 0
 @app.route('/')
 def Home():
     small_reword_arr = []
@@ -30,6 +31,18 @@ def Home():
         big_reword_arr.append(data.name)
     return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr)
 
+#pointを追加するエンドポイント
+@app.route('/add_points', methods=['POST'])
+def add_points():
+    global points
+    points += 1
+    return jsonify({'points': points})
+
+#pointを取得するエンドポイント
+@app.route('/get_points', methods=['GET'])
+def get_points():
+    global points
+    return jsonify({'points': points})
 
 @app.route('/add', methods=['GET'])
 def hello_world():

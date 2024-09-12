@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stopwatch</title>
+    <title>ストップウォッチ</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -15,14 +15,12 @@
             margin: 0;
             flex-direction: column;
         }
-
         h1 {
             color: #333;
             margin-bottom: 20px;
             font-size: 2.5em;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
-
         #time {
             font-size: 4em;
             margin: 20px;
@@ -31,12 +29,10 @@
             letter-spacing: 2px;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
         }
-
         .button-container {
             display: flex;
-            gap: 10px; /* ボタン間のスペースを確保 */
+            gap: 10px;
         }
-
         button {
             font-size: 1.5em;
             padding: 10px 20px;
@@ -49,82 +45,129 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s, transform 0.2s;
         }
-
         button:hover {
             background-color: #0056b3;
             transform: scale(1.05);
         }
-
         button:active {
             transform: scale(0.95);
         }
-
         button:focus {
             outline: none;
         }
-
+        /* 背景色の指定に関して、日本語の '背景色' を 'background-color' に修正 */
         button#stop {
             background-color: #dc3545;
         }
-
         button#stop:hover {
             background-color: #c82333;
         }
-
         button#reset {
             background-color: #28a745;
         }
-
         button#reset:hover {
             background-color: #218838;
         }
-
     </style>
+
 </head>
 <body>
-    <h1>Stopwatch</h1>
+    <h1>ストップウォッチ</h1>
     <div id="time">00:00:00</div>
-    
-    <!-- ボタンを .button-container に入れて影響を制限 -->
     <div class="button-container">
-        <button id="start" onclick="start()">Start</button>
-        <button id="stop" onclick="stop()">Stop</button>
-        <button id="reset" onclick="reset()">Reset</button>
+        <button id="start" onclick="start()">start</button>
+        <button id="stop" onclick="stop()">stop</button>
+        <button id="reset" onclick="reset()">reset</button>
     </div>
+    <div id="points">ポイント: 0</div>
 
     <script>
-        let timer;
+        // タイマー用の変数を初期化する
         let seconds = 0;
+        let timer = null;
+        let elapsedTime = 0;
 
-        function formatTime(seconds) {
-            let hours = Math.floor(seconds / 3600);
-            let minutes = Math.floor((seconds % 3600) / 60);
-            let secs = seconds % 60;
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        }
-
-        function updateTime() {
-            document.getElementById('time').textContent = formatTime(seconds);
-        }
-
-        function start() {
-            if (!timer) {
-                timer = setInterval(() => {
-                    seconds++;
-                    updateTime();
-                }, 1000);
+        // LocalStorageから前回のタイマーの時間を読み込む
+        window.onload = function() {
+            if (localStorage.getItem('timerStart')) {
+                startTime = parseInt(localStorage.getItem('timerStart'));
+            }
+            if (localStorage.getItem('elapsedTime')) {
+                elapsedTime = parseInt(localStorage.getItem('elapsedTime'));
+            }
+            if (localStorage.getItem('isRunning') === 'true') {
+                // ページリロード時にタイマーを再開
+                start();
+            } else {
+                updateTime();
             }
         }
 
-        function stop() {
-            clearInterval(timer);
-            timer = null;
+
+        // 時間をフォーマットする関数
+        function formatTime(seconds) {
+            let hours = Math.floor(seconds / 3600);  // 時間を計算
+            let minutes = Math.floor((seconds % 3600) / 60);  // 分を計算
+            let secs = seconds % 60;  // 秒を計算
+
+            // フォーマットを整えて返す
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
+        // 表示時間を更新する関数
+        function updateTime() {
+            document.getElementById('time').textContent = formatTime(seconds);  // 表示領域を更新
+        }
+
+        //サーバーにリクエストをして仮想のポイントを加算する関数
+        function addPoints() {
+            fetch('/add_points', {method: 'POST'})
+            .then(Response => response.json())
+            .then(date => {
+                points = date.points;
+                document.getElementById('points').textContent = 'ポイント: ${points}'; 
+            })
+            .catch(error => console.error('ポイントの追加に失敗しました:', error));
+        }
+        
+        function fetchPoints() {
+            fetch('/get_points')
+            .then(response => response.json())
+            .then(data => {
+            document.getElementById('points').textContent = data.points;
+            })
+            .catch(error => console.error('ポイントの取得に失敗しました:', error));
+        }
+        
+        //1, 10, 60分経過したかチェックする関数
+        function CheckTime() {
+            if (seconds % 60 === 0 && seconds !== 0) {
+                addPoints(); //経過時間ごとにサーバーにポイント加算
+            }
+        } 
+
+        // スタートボタンの処理
+        function start() {
+            if (!timer) {  // すでにタイマーが動いていない場合にのみ開始
+                timer = setInterval(() => {
+                    seconds++;
+                    updateTime();
+                    CheckTime();  // 表示を更新
+                }, 1000);  // 1秒ごとに実行
+            }
+        }
+
+        // ストップボタンの処理
+        function stop() {
+            clearInterval(timer);  // タイマーを停止
+            timer = null;  // タイマーをリセット
+        }
+
+        // リセットボタンの処理
         function reset() {
-            stop();
-            seconds = 0;
-            updateTime();
+            stop();  // 一度タイマーを停止
+            seconds = 0;  // 秒を0にリセット
+            updateTime();  // 表示をリセット
         }
     </script>
 </body>
