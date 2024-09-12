@@ -43,8 +43,27 @@
             color: white;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s, transform 0.2s;
+            transition: background-color 0.3s, 
+            transform 0.2s;
         }
+
+        #cat-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .cat {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+        }
+        #points {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
         button:hover {
             background-color: #0056b3;
             transform: scale(1.05);
@@ -55,7 +74,6 @@
         button:focus {
             outline: none;
         }
-        /* 背景色の指定に関して、日本語の '背景色' を 'background-color' に修正 */
         button#stop {
             background-color: #dc3545;
         }
@@ -69,7 +87,6 @@
             background-color: #218838;
         }
     </style>
-
 </head>
 <body>
     <h1>ストップウォッチ</h1>
@@ -82,93 +99,81 @@
     <div id="points">ポイント: 0</div>
 
     <script>
-        // タイマー用の変数を初期化する
-        let seconds = 0;
         let timer = null;
-        let elapsedTime = 0;
+        let seconds = 0;
 
-        // LocalStorageから前回のタイマーの時間を読み込む
-        window.onload = function() {
-            if (localStorage.getItem('timerStart')) {
-                startTime = parseInt(localStorage.getItem('timerStart'));
-            }
-            if (localStorage.getItem('elapsedTime')) {
-                elapsedTime = parseInt(localStorage.getItem('elapsedTime'));
-            }
-            if (localStorage.getItem('isRunning') === 'true') {
-                // ページリロード時にタイマーを再開
-                start();
-            } else {
-                updateTime();
-            }
-        }
-
-
-        // 時間をフォーマットする関数
         function formatTime(seconds) {
-            let hours = Math.floor(seconds / 3600);  // 時間を計算
-            let minutes = Math.floor((seconds % 3600) / 60);  // 分を計算
-            let secs = seconds % 60;  // 秒を計算
-
-            // フォーマットを整えて返す
+            let hours = Math.floor(seconds / 3600);
+            let minutes = Math.floor((seconds % 3600) / 60);
+            let secs = seconds % 60;
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
-        // 表示時間を更新する関数
-        function updateTime() {
-            document.getElementById('time').textContent = formatTime(seconds);  // 表示領域を更新
-        }
-
-        //サーバーにリクエストをして仮想のポイントを加算する関数
         function addPoints() {
-            fetch('/add_points', {method: 'POST'})
-            .then(Response => response.json())
-            .then(date => {
-                points = date.points;
-                document.getElementById('points').textContent = 'ポイント: ${points}'; 
-            })
-            .catch(error => console.error('ポイントの追加に失敗しました:', error));
+            points++;
+            document.getElementById('points').textContent = `ポイント: ${points}`;
+            showCat();
         }
-        
-        function fetchPoints() {
-            fetch('/get_points')
-            .then(response => response.json())
-            .then(data => {
-            document.getElementById('points').textContent = data.points;
-            })
-            .catch(error => console.error('ポイントの取得に失敗しました:', error));
-        }
-        
-        //1, 10, 60分経過したかチェックする関数
-        function CheckTime() {
-            if (seconds % 60 === 0 && seconds !== 0) {
-                addPoints(); //経過時間ごとにサーバーにポイント加算
-            }
-        } 
 
-        // スタートボタンの処理
+        // 猫画像を表示する
+        function showCat() {
+            const catContainer = document.getElementById('cat-container');
+            const img = document.createElement('img');
+            img.src = `https://natgeo.nikkeibp.co.jp/atcl/web/15/327803/021000043/ph_thumb.jpg/100/100?random=${Math.random()}`;  // ランダムな猫画像
+            img.className = 'cat';
+            catContainer.appendChild(img);  // 猫画像を追加
+        }
+
+        function updateTime() {
+            document.getElementById('time').textContent = formatTime(seconds);
+        }
+
+        function addPoints() {
+            fetch('/add_points', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
+                })
+                .catch(error => console.error('ポイントの追加に失敗しました:', error));
+        }
+
         function start() {
-            if (!timer) {  // すでにタイマーが動いていない場合にのみ開始
+            if (!timer) {
                 timer = setInterval(() => {
                     seconds++;
                     updateTime();
-                    CheckTime();  // 表示を更新
-                }, 1000);  // 1秒ごとに実行
+                    if (seconds % 60 === 0 && seconds !== 0) {
+                        addPoints(); // 1分ごとにポイントを加算
+                    }
+                }, 1000);
             }
         }
 
-        // ストップボタンの処理
         function stop() {
-            clearInterval(timer);  // タイマーを停止
-            timer = null;  // タイマーをリセット
+            clearInterval(timer);
+            timer = null;
         }
 
-        // リセットボタンの処理
         function reset() {
-            stop();  // 一度タイマーを停止
-            seconds = 0;  // 秒を0にリセット
-            updateTime();  // 表示をリセット
+            stop();
+            seconds = 0;
+            updateTime();
         }
+
+        // 初期ポイントを取得して表示
+        function fetchPoints() {
+            fetch('/get_points')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
+                })
+                .catch(error => console.error('ポイントの取得に失敗しました:', error));
+        }
+
+        // ページ読み込み時にポイントを取得
+        window.onload = function() {
+            fetchPoints();
+        };
     </script>
 </body>
 </html>

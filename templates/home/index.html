@@ -37,10 +37,10 @@
 
                 <div class="text-center">
                     <div class="display-6 text-success mb-2">
-                        今日の獲得ポイント: <span id="todayPoints">0</span> pt
+                        今日の獲得ポイント: <span id="todayPoints"></span> pt
                     </div>
                     <div class="display-6 text-warning">
-                        総合獲得ポイント: <span id="totalPoints">0</span> pt
+                        総合獲得ポイント: <span id="totalPoints"></span> pt
                     </div>
                 </div>
             </div>
@@ -81,8 +81,8 @@
                 目標に向かって頑張ろう！
             </div>
             <div class="card-body text-center">
-                <p class="mb-0">1週間の目標時間: <strong>300分</strong></p>
-                <p>進捗状況: <span class="text-primary">120分</span> / 300分</p>
+                <p class="mb-0">1週間の目標時間: <strong></strong></p>
+                <p>進捗状況: <span class="text-primary"></span> / </p>
             </div>
         </div>
     </div>
@@ -114,6 +114,7 @@
             var small_reword_arr = JSON.parse("{{small_reword_arr}}")
             console.log(small_reword_arr);
             let largeRewards = big_reword
+            
 
             const smallRewardList = document.getElementById('smallReward');
             const largeRewardList = document.getElementById('largeReward');
@@ -123,14 +124,14 @@
 
             // 小さなご褒美の表示
             if (points >= 60) {
-                const randomSmallReward = smallRewards[Math.floor(Math.random() * smallRewards.length)];
-                smallRewardList.innerHTML += `<div class="list-group-item text-center">${randomSmallReward}</div>`;
+            const randomSmallReward = smallRewards[Math.floor(Math.random() * smallRewards.length)];
+            smallRewardList.innerHTML += `<div class="list-group-item text-center">${randomSmallReward}</div>`;
             }
 
             // 大きなご褒美の表示
-            if (points >= 60) {
-                const randomLargeReward = largeRewards[Math.floor(Math.random() * largeRewards.length)];
-                largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
+            if (points >= 120) {  // ここでは大きなご褒美の条件を変更
+            const randomLargeReward = largeRewards[Math.floor(Math.random() * largeRewards.length)];
+            largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
             }
         }
 

@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
+from datetime import timedelta
 from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,10 +8,17 @@ import json
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'timer'
+app.permanent_session_lifetime = timedelta(minutes=5) # -> 5分 #(days=5) -> 5日保存
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
+
+class UserPoints(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    points = db.Column(db.Integer, default=0)
 
 class Reword(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,6 +27,7 @@ class Reword(db.Model):
     description = db.Column(db.String(200))
 
 points = 0
+
 @app.route('/')
 def Home():
     small_reword_arr = []
@@ -29,20 +38,36 @@ def Home():
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr)
+    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr,  points=UserPoints)
 
-#pointを追加するエンドポイント
+@app.route("/", methods = ["GET"])
+def test():
+    session.permanent = True  # <--- makes the permanent session
+    timer = request.form["timer"] #ユーザー情報を保存する
+    session["timer"] = timer #sessionにtimer情報を保存
+
+
+
 @app.route('/add_points', methods=['POST'])
 def add_points():
-    global points
-    points += 1
-    return jsonify({'points': points})
+    user = UserPoints.query.first()  # 仮に1人のユーザーとして扱う場合
+    if user is None:
+        user = UserPoints(points=0)
+        db.session.add(user)
+    user.points += 1  # 1ポイントを加算
+    db.session.commit()
+    return jsonify({'points': user.points})  # 最新のポイントを返す
 
-#pointを取得するエンドポイント
+
 @app.route('/get_points', methods=['GET'])
 def get_points():
-    global points
-    return jsonify({'points': points})
+    user = UserPoints.query.first()  # 仮に1人のユーザーとして扱う場合
+    if user is None:
+        user = UserPoints(points=0)
+        db.session.add(user)
+        db.session.commit()
+    return jsonify({'points': user.points})
+
 
 @app.route('/add', methods=['GET'])
 def hello_world():
