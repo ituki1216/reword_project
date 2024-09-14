@@ -1,5 +1,70 @@
 {% block content %}
+
+<style>
+    /* サイト説明部分のスタイル */
+    .site-description {
+      background-color: #f0f8ff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 1.1em;
+      color: #333;
+    }
+  
+    /* ラベルと入力フィールドのスタイル */
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+  
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+  
+    /* 登録ボタンのスタイル */
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+  
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  
+    /* 全体レイアウトの調整 */
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+  </style>
+
+
 <h1>ユーザ登録</h1>
+
+<div class="site-description">
+    <p>このサイトは、勉強時間に応じて仮想のポイントを取得し、ランダムでリワードを得ることができるサイトです。<br>
+    コンセプトとしては「勉強を楽しく、自分にご褒美を与えよう」です。ぜひご登録ください！</p>
+</div>
+
 <form method="POST">
     <label for="">username</label>
     <input type="text" name="name">
