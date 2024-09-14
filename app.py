@@ -130,7 +130,7 @@ def get_points():
 
 
 @app.route('/add', methods=['GET'])
-def add():
+def add_get():
     small_reword = Reword.query.filter(Reword.reword_kind == 0)
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     return render_template('register_rewords/index.html', small_reword=small_reword, big_reword=big_reword)
@@ -159,8 +159,10 @@ def delete():
 def add():
     reword_kind = False
     print(request.form)
-    if request.form.get('reword_kind'):
+    if request.form.get('reword_kind') is not None:
         reword_kind = True
+    else:
+        reword_kind = False
     reword_text = request.form['reword']
     new_reword = Reword(name=reword_text, reword_kind=reword_kind)
     db.session.add(new_reword)
