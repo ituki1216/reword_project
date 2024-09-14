@@ -1,10 +1,10 @@
 import json
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from flask import Flask, jsonify, render_template, flash, url_for
 from flask import request, redirect, session
 from flask_migrate import Migrate
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import random 
@@ -34,13 +34,21 @@ class User(UserMixin, db.Model):
 class UserPoints(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     points = db.Column(db.Integer, default=0)
+    user_id = db.Column(db.Integer)
 
+class UserPointsHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    points = db.Column(db.Integer, default=0)
+    user_id = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.now())
 
 class Reword(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
+    user_id = db.Column(db.Integer)
+    point = db.Column(db.Integer)
 
 
 points = 0
@@ -51,14 +59,25 @@ points = 0
 def Home():
     small_reword_arr = []
     big_reword_arr = []
+    user_id = current_user.get_id()
+    total_points = UserPoints.query.filter(UserPoints.user_id==user_id).first()
     small_reword = Reword.query.filter(Reword.reword_kind == 0)
+    today_points = UserPointsHistory.query.filter(UserPointsHistory.user_id==user_id, UserPointsHistory.created_at >= datetime.now().date(), UserPointsHistory.created_at < datetime.now().date() +timedelta(days=1)).first()
     for data in small_reword:
         small_reword_arr.append(data.name)
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr,
-                           points=UserPoints)
+    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr, today_points=today_points, total_points=total_points)
+
+def check_date(user_history):
+    
+    today = datetime.now().date()
+    if today == user_history.created_at.date():
+        return True
+    else:
+        return False
+    
 
 @app.route('/signup', methods=['GET'])
 def sign():
@@ -82,7 +101,7 @@ def login():
         user = User.query.filter_by(mail_address=email).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            flash('You have been logged in!', 'success')
+            flash('ログイン成功しました！', 'success')
             return redirect(url_for('Home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
@@ -101,42 +120,53 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-@app.route("/", methods=["GET"])
-def test():
-    session.permanent = True
-    timer = request.form["timer"]
-    session["timer"] = timer
-
-
 @app.route('/add_points', methods=['POST'])
+@login_required
 def add_points():
-    user = UserPoints.query.first()  # 仮に1人のユーザーとして扱う場合
-    if user is None:
-        user = UserPoints(points=0)
-        db.session.add(user)
+    user_id = current_user.get_id()
+    user = UserPoints.query.filter(UserPoints.user_id==user_id).first()  # 仮に1人のユーザーとして扱う場合
+    user_history = UserPointsHistory.query.filter(
+    UserPointsHistory.user_id == user_id,
+    UserPointsHistory.created_at >= datetime.now().date(),
+    UserPointsHistory.created_at < (datetime.now().date() + timedelta(days=1))
+).first()
+    if user_history is None:
+        print('Aaa')
+        user_history = UserPointsHistory(user_id=user_id, points=1)
+    else:
+        print(user_history.points)
+        if check_date(user_history):
+            user_history.points += 1
     user.points += 1  # 1ポイントを加算
+    db.session.add(user)
+    db.session.add(user_history)
     db.session.commit()
     return jsonify({'points': user.points})  # 最新のポイントを返す
 
 
 @app.route('/get_points', methods=['GET'])
+@login_required
 def get_points():
-    user = UserPoints.query.first()  # 仮に1人のユーザーとして扱う場合
+    user_id = current_user.get_id()
+    print(UserPointsHistory.query.first().points)
+    user = UserPoints.query.filter(UserPoints.user_id==user_id).first() # 仮に1人のユーザーとして扱う場合 
     if user is None:
-        user = UserPoints(points=0)
+        user = UserPoints(points=0, user_id=user_id)
         db.session.add(user)
         db.session.commit()
     return jsonify({'points': user.points})
 
 
 @app.route('/add', methods=['GET'])
+@login_required
 def add_get():
-    small_reword = Reword.query.filter(Reword.reword_kind == 0)
-    big_reword = Reword.query.filter(Reword.reword_kind == 1)
+    small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id())
+    big_reword = Reword.query.filter(Reword.reword_kind == 1, Reword.user_id == current_user.get_id())
     return render_template('register_rewords/index.html', small_reword=small_reword, big_reword=big_reword)
 
 
 @app.route('/update', methods=['POST'])
+@login_required
 def update():
     id = request.form["id"]
     name = request.form["reword"]
@@ -147,6 +177,7 @@ def update():
 
 
 @app.route('/delete', methods=['POST'])
+@login_required
 def delete():
     id = request.form["id"]
     record_to_delete = Reword.query.filter_by(id=id).first()
@@ -156,23 +187,29 @@ def delete():
 
 
 @app.route('/create', methods=['POST'])
+@login_required
 def add():
     reword_kind = False
-    print(request.form)
     if request.form.get('reword_kind') is not None:
         reword_kind = True
+        points = random.randrange(300, 1000)
     else:
         reword_kind = False
+        points = random.randrange(60, 299)
     reword_text = request.form['reword']
-    new_reword = Reword(name=reword_text, reword_kind=reword_kind)
+    user_id = current_user.get_id()
+    new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
     db.session.add(new_reword)
+    print(user_id, points)
     db.session.commit()
     return redirect("/add")
 
 
 @app.route('/stopwatch')
+@login_required
 def stopwatch():
-    return render_template('register_rewords/stopwatch.html')
+    user_id = current_user.get_id()
+    return render_template('register_rewords/stopwatch.html', user_id=user_id)
 
 
 if __name__ == '__main__':
