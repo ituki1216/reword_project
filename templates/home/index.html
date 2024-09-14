@@ -10,6 +10,22 @@
 </head>
 
 <body class="bg-light">
+    {% extends "common/header.html" %}
+    {% block content %}
+    <div class="container mt-3"></div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
     <style>
         body {
             background-image: url("/static/images/reword.jpg");
@@ -75,8 +91,10 @@
                 </div>
             </div>
         </div>
-        <a href="http://127.0.0.1:5000/add">
-        <div class="mb-3"><button class="btn btn-danger col-12 text-white mgtext-center" type="button">追加</button></div></a>
+        <a href="{{url_for('add')}}">
+            <div class="mb-3"><button class="btn btn-danger col-12 text-white mgtext-center" type="button">追加</button>
+            </div>
+        </a>
 
 
         <div class="card border-primary">
@@ -117,7 +135,7 @@
             var small_reword_arr = JSON.parse("{{small_reword_arr}}")
             console.log(small_reword_arr);
             let largeRewards = big_reword
-            
+
 
             const smallRewardList = document.getElementById('smallReward');
             const largeRewardList = document.getElementById('largeReward');
@@ -127,14 +145,14 @@
 
             // 小さなご褒美の表示
             if (points >= 60) {
-            const randomSmallReward = smallRewards[Math.floor(Math.random() * smallRewards.length)];
-            smallRewardList.innerHTML += `<div class="list-group-item text-center">${randomSmallReward}</div>`;
+                const randomSmallReward = smallRewards[Math.floor(Math.random() * smallRewards.length)];
+                smallRewardList.innerHTML += `<div class="list-group-item text-center">${randomSmallReward}</div>`;
             }
 
             // 大きなご褒美の表示
             if (points >= 120) {  // ここでは大きなご褒美の条件を変更
-            const randomLargeReward = largeRewards[Math.floor(Math.random() * largeRewards.length)];
-            largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
+                const randomLargeReward = largeRewards[Math.floor(Math.random() * largeRewards.length)];
+                largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
             }
         }
 
@@ -145,6 +163,7 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    {% endblock %}
 </body>
 
 </html>
