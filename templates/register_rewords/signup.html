@@ -1,79 +1,315 @@
-{% block content %}
+<!DOCTYPE html>
+<html lang="ja">
 
-<style>
-    /* サイト説明部分のスタイル */
-    .site-description {
-      background-color: #f0f8ff;
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 1.1em;
-      color: #333;
-    }
-  
-    /* ラベルと入力フィールドのスタイル */
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      color: #333;
-    }
-  
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-  
-    /* 登録ボタンのスタイル */
-    input[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-  
-    input[type="submit"]:hover {
-      background-color: #45a049;
-    }
-  
-    /* 全体レイアウトの調整 */
-    form {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-  
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-  </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - お菓子のサイト</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #682d07;
+            --secondary-color: #FFD700; 
+            --success-color: #28a745; 
+            --danger-color: #dc3545; 
+            --warning-color: #FFA500; 
+            --info-color: #682d07; 
+            --light-color: #f8f9fa; 
+            --dark-color: #343a40; 
+            --purple-color: #6f42c1; 
+            --teal-color: #20c997; 
+            --indigo-color: #6610f2; 
+            --pink-color: #FF69B4; 
+            --brown-color: #8B4513; 
+            --lime-color: #32CD32; 
+            --magenta-color: #FF00FF;
+        }
 
+        body {
+            background-image: url('https://at-living.press/wp-content/uploads/2022/02/20220204_atliving_choco_main-760x507.jpg');
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-position: center center; 
+            background-attachment: fixed; 
+            color: var(--dark-color); 
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
 
-<h1>ユーザ登録</h1>
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
 
-<div class="site-description">
-    <p>このサイトは、勉強時間に応じて仮想のポイントを取得し、ランダムでリワードを得ることができるサイトです。<br>
-    コンセプトとしては「勉強を楽しく、自分にご褒美を与えよう」です。ぜひご登録ください！</p>
-</div>
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(30, 144, 255, 0.2);
+        }
 
-<form method="POST">
-    <label for="">username</label>
-    <input type="text" name="name">
+        .alert-container {
+            margin-bottom: 20px;
+        }
 
-    <label for="">mail_address</label>
-    <input type="text" name="mail_address">
+        .alert {
+            border: 1px solid;
+            border-radius: 5px;
+        }
 
-    <label for="">password</label>
-    <input type="password" name="password">
-    <input type="submit" value="新規登録">
-</form>
-{% endblock %}
+        .alert-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #ffffff;
+        }
+
+        .alert-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: #ffffff;
+        }
+
+        .alert-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #ffffff;
+        }
+
+        .alert-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            color: #ffffff;
+        }
+
+        label {
+            margin-top: 10px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+            background-color: var(--light-color);
+            border: 1px solid var(--dark-color);
+            color: var(--dark-color);
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
+            color: var(--dark-color);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            margin-top: 15px;
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 5px;
+            color: #ffffff;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #1c86ee;
+            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
+        }
+
+        .register-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--teal-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .register-link:hover {
+            color: var(--indigo-color);
+            text-decoration: underline;
+        }
+
+        .github-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .github-link .btn {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            color: var(--dark-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .github-link .btn:hover {
+            background-color: #ffb700;
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .description {
+            padding-left: 20px;
+            border-left: 2px solid var(--primary-color);
+            color: var(--dark-color);
+        }
+
+        .description h2 {
+            color: var(--indigo-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(102, 16, 242, 0.2);
+        }
+
+        .description p {
+            line-height: 1.6;
+            color: var(--dark-color);
+        }
+
+        .description .highlight-blue {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-yellow {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-green {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-orange {
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-purple {
+            color: var(--purple-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-teal {
+            color: var(--teal-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-indigo {
+            color: var(--indigo-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-magenta {
+            color: var(--magenta-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-lime {
+            color: var(--lime-color);
+            font-weight: 500;
+        }
+
+        .description .highlight-brown {
+            color: var(--brown-color);
+            font-weight: 500;
+        }
+
+        .description img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .description {
+                padding-left: 0;
+                border-left: none;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>ユーザ登録</h1>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="name">ユーザー名</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mail_address">メールアドレス</label>
+                        <input type="email" class="form-control" id="mail_address" name="mail_address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">パスワード</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">新規登録</button>
+                </form>
+
+                <div class="github-link">
+                    <a href="https://github.com/ituki1216/reword_project" class="btn btn-secondary" target="_blank">
+                        <i class="bi bi-github"></i> GitHubリポジトリにアクセス
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 description">
+                <h2>サイトの説明</h2>
+                <p>
+                    このサイトは、<span class="highlight-blue">勉強時間</span>に応じて
+                    <span class="highlight-yellow">仮想のポイント</span>を取得し、
+                    <span class="highlight-green">ランダムでリワード</span>を得ることができるサイトです。<br>
+                    コンセプトとしては
+                    <span class="highlight-orange">「勉強を楽しく」</span>、
+                    <span class="highlight-purple">「自分にご褒美を与えよう」</span>
+                    です。ぜひご登録ください！
+                </p>
+                <img src="https://storage.aeonshop.com/assets/file/products/img/rc/4582369133910/rc_4582369133910_01.jpg" alt="サイトの説明画像">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
