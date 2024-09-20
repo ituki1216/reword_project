@@ -1,7 +1,7 @@
 <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg" style="background-color: #f8c6d1;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('Home') }}">MyApp</a>
+            <a class="navbar-brand" href="{{ url_for('Home') }}" style="color: #ff6f61;">reword_project</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -9,17 +9,17 @@
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Hello, {{ current_user.name }}!</a>
+                            <a class="nav-link" href="#" style="color: #ff6f61;">こんにちわ！ {{ current_user.name }}!</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-danger" href="{{ url_for('logout') }}">Logout</a>
+                            <a class="nav-link btn btn-outline-danger" href="{{ url_for('logout') }}" style="border-color: #ff6f61; color: #ff6f61;">Logout</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                            <a class="nav-link" href="{{ url_for('login') }}" style="color: #ff6f61;">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                            <a class="nav-link" href="{{ url_for('register') }}" style="color: #ff6f61;">Register</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -28,7 +28,6 @@
     </nav>
 </header>
 
-<!-- Your page content here -->
 <div class="container mt-5">
     {% block content %}{% endblock %}
 </div>
