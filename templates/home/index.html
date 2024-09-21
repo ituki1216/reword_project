@@ -33,7 +33,7 @@
         }
     </style>
     <div class="container my-5">
-        <h1 class="text-center mb-4 text-primary">ウハウハご褒美タイム</h1>
+        <h1 class="text-center mb-4 text-primary">自分へのご褒美TIME!!!</h1>
 
         <div class="card border-info mx-auto mb-4" style="max-width: 600px;">
             <div class="card-header text-center bg-info text-white">
@@ -63,11 +63,11 @@
                         小さなご褒美
                     </div>
                     <div class="card-body text-center">
-                        <div id="smallReward" class="list-group">
-                            <div class="list-group-item text-center">ポイントを計算してご褒美をゲット！</div>
+                        <div class="list-group">
+                            <div id="smallReword" class="list-group-item text-center">ポイントを計算してご褒美をゲット！</div>
                         </div>
                         <div class="mt-3">
-                            <button class="btn btn-info w-30" onclick="calculatePoints()">抽選する</button>
+                            <button class="btn btn-info w-30" onclick="fetchSmallRewords()">抽選する</button>
                         </div>
                     </div>
                 </div>
@@ -119,15 +119,23 @@
 
 
         function calculatePoints() {
-            const studyTime = fetchStudyTime();
-            const todayPoints = studyTime ? parseInt(studyTime) : 0;
-            const totalPoints = fetchTotalPoints() + todayPoints;
-
-            document.getElementById('studyTime').value = studyTime;
-            document.getElementById('todayPoints').innerText = todayPoints;
-            document.getElementById('totalPoints').innerText = totalPoints;
 
             displayRewards(todayPoints);
+        }
+
+        function fetchSmallRewords() {
+            fetch('/small_reword')  
+                .then(response => response.json())
+                .then(data => {
+                    if(data.reword){
+                        document.getElementById("smallReword").innerText = data.reword
+                    }
+                    else{
+                    document.getElementById("smallReword").innerText = "ポイントが足りません。。。。"
+                    console.log(data)
+                    }
+                })
+                .catch(error => console.error('ポイント取得エラー:', error));
         }
 
         function fetchPoints() {
@@ -166,11 +174,6 @@
                 largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
             }
         }
-
-        // ページ読み込み時に自動的にポイントを計算
-        document.addEventListener('DOMContentLoaded', () => {
-            calculatePoints();
-        });
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchPoints();

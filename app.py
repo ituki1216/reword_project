@@ -175,6 +175,26 @@ def clear_cache():
     session.clear()  # セッションをクリア
     return redirect(url_for('Home'))  # トップページにリダイレクト
 
+@app.route('/small_reword', methods=['GET'])
+@login_required
+def get_small_reword():
+    user_id = current_user.get_id()
+    rewords = []
+    user_points = UserPoints.query.filter_by(user_id=user_id).first()
+    small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id()).all()
+    print(user_points.points)
+    for reword in small_reword:
+        if int(user_points.points) >= int(reword.point):
+            rewords.append(reword.name)
+    if len(rewords):
+        select_reword = rewords[random.randrange(0, len(rewords)-1)]
+        small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id(), Reword.name == select_reword).first()
+        calc_points = user_points.points - small_reword.point
+        user_points.points = calc_points
+        db.session.commit()
+        return jsonify({'reword': select_reword})
+    return[]
+
 @app.route('/add', methods=['GET'])
 @login_required
 def add_get():
@@ -213,7 +233,7 @@ def add():
         points = random.randrange(300, 1000)
     else:
         reword_kind = False
-        points = random.randrange(60, 299)
+        points = 0 #random.randrange(0, 1)
     reword_text = request.form['reword']
     user_id = current_user.get_id()
     new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
