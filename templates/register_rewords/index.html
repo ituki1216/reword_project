@@ -2,78 +2,408 @@
 <html lang="ja">
 
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テストWebアプリ</title>
+    <title>ご褒美追加 - お菓子のサイト</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #FF69B4; 
+            --secondary-color: #FFD700; 
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #FFA500;
+            --info-color: #17a2b8;
+            --light-color: #fff5f8;
+            --dark-color: #343a40;
+            --purple-color: #6f42c1;
+            --teal-color: #20c997;
+            --indigo-color: #6610f2;
+            --brown-color: #8B4513;
+            --lime-color: #32CD32;
+            --magenta-color: #FF00FF;
+        }
+
+        body {
+            background-image: url('https://images.unsplash.com/photo-1589927986089-35812389fc8c?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            color: var(--dark-color);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .h1-icon {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -50px;
+            font-size: 60px;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            background-color: var(--light-color);
+            border: 2px solid var(--primary-color);
+            color: var(--dark-color);
+            border-radius: 10px;
+            padding: 12px 20px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: #ffffff;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            color: var(--dark-color);
+        }
+
+        .btn-info {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            color: var(--dark-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-info:hover {
+            background-color: #e6c200;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            color: #ffffff;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            box-shadow: 0 4px 15px rgba(200, 35, 51, 0.3);
+        }
+
+        .register-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--teal-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .register-link:hover {
+            color: var(--indigo-color);
+            text-decoration: underline;
+        }
+
+        .github-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .github-link .btn {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 10px;
+            color: var(--dark-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .github-link .btn:hover {
+            background-color: #ffb700;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .alert-container {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            border: 2px solid;
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: #ffffff;
+        }
+
+        .alert-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            color: #ffffff;
+        }
+
+        .alert-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #ffffff;
+        }
+
+        .alert-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            color: #ffffff;
+        }
+
+        .description {
+            padding-left: 20px;
+            border-left: 4px solid var(--primary-color);
+            color: var(--dark-color);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .description h2 {
+            color: var(--indigo-color);
+            font-family: 'Pacifico', cursive;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(102, 16, 242, 0.2);
+        }
+
+        .description p {
+            line-height: 1.8;
+        }
+
+        .description .highlight-yellow {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .description img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .description {
+                padding-left: 0;
+                border-left: none;
+                margin-top: 20px;
+            }
+
+            .h1-icon {
+                top: -40px;
+                font-size: 40px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .description h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <h1>index.html表示してます</h1>
-    <form action="/create" method="POST">
-        <input type="text" name="reword" placeholder="なまくり～む" />
-        <input type="checkbox" id="big_reword" name="reword_kind" placeholder="なまくり～む" />
-        <label for="big_reword">
-            大きなご褒美
-        </label>
-        <button type="submit" class="btn btn-info">追加</button>
-        <a href="{{url_for('Home')}}">
-            <button type="button" class="btn btn-danger">back</button></a>
-            
-        <div>
-            {% for data in small_reword %}
-            {{data.id}}: {{data.name}}: 
-            {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 position-relative">
+                <i class="bi bi-gift-fill h1-icon"></i> 
+
+                <h1>ご褒美を追加していきましょう！</h1>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <form action="/create" method="POST">
+                    <div class="form-group">
+                        <label for="reword">ご褒美の名前:</label>
+                        <input type="text" class="form-control" id="reword" name="reword" placeholder="例: チョコレート" required>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="big_reword" name="reword_kind">
+                        <label class="form-check-label" for="big_reword">大きなご褒美</label>
+                    </div>
+                    <button type="submit" class="btn btn-info"><i class="bi bi-plus-circle"></i> 追加</button>
+                    <a href="{{ url_for('Home') }}" class="btn btn-danger mt-2">
+                        <i class="bi bi-arrow-left-circle"></i> 戻る
+                    </a>
+
+                    <div class="mt-4">
+                        <h5>小さなご褒美一覧</h5>
+                        <ul class="list-group">
+                            {% for data in small_reword %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ data.id }}: {{ data.name }}</span>
+                                <span>
+                                    <a href="/edit/{{ data.id }}" class="btn btn-sm btn-warning me-2"><i class="bi bi-pencil-square"></i></a>
+                                    <form action="/delete" method="POST" class="d-inline">
+                                        <input type="hidden" name="id" value="{{ data.id }}">
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i></button>
+                                    </form>
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>大きなご褒美一覧</h5>
+                        <ul class="list-group">
+                            {% for data in big_reword %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ data.id }}: {{ data.name }}</span>
+                                <span>
+                                    <a href="/edit/{{ data.id }}" class="btn btn-sm btn-warning me-2"><i class="bi bi-pencil-square"></i></a>
+                                    <form action="/delete" method="POST" class="d-inline">
+                                        <input type="hidden" name="id" value="{{ data.id }}">
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i></button>
+                                    </form>
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </form>
+
+                <form action="/update" method="POST" class="mt-4">
+                    <div class="form-group">
+                        <label for="update_id">更新したいID:</label>
+                        <input type="text" class="form-control" id="update_id" name="id" placeholder="例: 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="update_reword">新しいご褒美の名前:</label>
+                        <input type="text" class="form-control" id="update_reword" name="reword" placeholder="例: マカロン" required>
+                    </div>
+                    <button type="submit" class="btn btn-info"><i class="bi bi-pencil-square"></i> 更新</button>
+                </form>
+
+                <form action="/delete" method="POST" class="mt-4">
+                    <div class="form-group">
+                        <label for="delete_id">削除したいID:</label>
+                        <input type="text" class="form-control" id="delete_id" name="id" placeholder="例: 2" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> 削除</button>
+                </form>
+            </div>
+
+            <div class="col-md-6 description">
+                <h2>ご褒美の管理</h2>
+                <p>
+                    このページでは、ユーザーが取得したポイントに応じて
+                    <span class="highlight-yellow">様々なお菓子のご褒美</span>を追加、更新、削除することができます。<br>
+                    ポイントを活用して、自分へのご褒美として美味しいお菓子を楽しんでください！
+                </p>
+                <img src="https://st2.depositphotos.com/4135663/7084/i/450/depositphotos_70849227-stock-photo-row-of-macaroons-on-black.jpg" alt="お菓子のイメージ画像">
+
+                <div class="mt-4">
+                    <h5>現在のポイント: <span id="points">0</span></h5>
+                </div>
+
+                <form action="/update" method="POST" class="mt-3">
+                    <div class="form-group">
+                        <label for="update_id">更新したいID:</label>
+                        <input type="text" class="form-control" id="update_id" name="id" placeholder="例: 1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="update_reword">新しいご褒美の名前:</label>
+                        <input type="text" class="form-control" id="update_reword" name="reword" placeholder="例: マカロン" required>
+                    </div>
+                    <button type="submit" class="btn btn-info"><i class="bi bi-pencil-square"></i> 更新</button>
+                </form>
+
+                <form action="/delete" method="POST" class="mt-3">
+                    <div class="form-group">
+                        <label for="delete_id">削除したいID:</label>
+                        <input type="text" class="form-control" id="delete_id" name="id" placeholder="例: 2" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> 削除</button>
+                </form>
+            </div>
         </div>
-        <div>
-            {% for data in big_reword %} 
-            {{data.id}}: {{data.name}}: 
-            {% endfor %}
-        </div>
-    </form>
+    </div>
 
-    <form action="/update" method="POST">
-        <input type="text" name="id" placeholder="更新したいID" />
-        <input type="text" name="reword" placeholder="なまくり～む" />
-        <button type="submit" class="btn btn-info">更新</button>
-    </form>
-
-    <form action="/delete" method="POST">
-        <input type="text" name="id" placeholder="削除したいID" />
-        <button type="submit" class="btn btn-danger">削除</button>
-    </form>
-
-    <!-- 1分ごとにポイントを加算するためのJavaScript -->
     <script>
-        // 現在のポイントを取得して表示する関数
-    function fetchPoints() {
-        fetch('/get_points')
-            .then(response => response.json())
-            .then(data => {
-            document.getElementById('points').textContent = data.points;
-        })
-        .catch(error => console.error('ポイントの取得に失敗しました:', error));
-    }
-
-    // 1ポイントをサーバーに追加する関数
-    function addPoint() {
-        fetch('/add_points', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-            document.getElementById('points').textContent = data.points;
-            })
-            .catch(error => console.error('ポイントの追加に失敗しました:', error));
+        function fetchPoints() {
+            fetch('/get_points')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = data.points;
+                })
+                .catch(error => console.error('ポイントの取得に失敗しました:', error));
         }
 
-        // ページロード時にポイントを表示し、1分ごとにポイントを加算
-        window.onload = function() {
-            fetchPoints();  // 初回ロード時にポイントを取得
-            setInterval(addPoint, 60000);  // 1分ごとにポイントを加算
+        function addPoint() {
+            fetch('/add_points', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = data.points;
+                })
+                .catch(error => console.error('ポイントの追加に失敗しました:', error));
+        }
+
+        window.onload = function () {
+            fetchPoints();  
+            setInterval(addPoint, 60000);  
         }
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+3U0h3Pv5HAXfHEfQ6b4aaXQmK/NK"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

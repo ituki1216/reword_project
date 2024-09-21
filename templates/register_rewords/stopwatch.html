@@ -47,7 +47,7 @@
             background-color: #007BFF;
             color: white;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(16, 15, 15, 0.2);
             transition: background-color 0.3s,
                 transform 0.2s;
         }
@@ -92,12 +92,13 @@
         }
 
         button#reset {
-            background-color: #28a745;
+            background-color: #199e5c;
         }
 
         button#reset:hover {
-            background-color: #218838;
+            background-color: #401262;
         }
+        
     </style>
 </head>
 
@@ -108,10 +109,17 @@
         <button id="start" onclick="start()">start</button>
         <button id="stop" onclick="stop()">stop</button>
         <button id="reset" onclick="reset()">reset</button>
+        <form action="/test_point" method="POST">
+            <button type="submit"><i class="bi bi-plus-circle"></i> 1000ポイント付与</button>
+        </form>
+        <!--<button id="admin" onclick="reset()">test</button> -->
     </div>
     <div id="points">ポイント: 0</div>
     <input type="hidden" value="{{user_id}}" id="user_id">
     
+
+
+
     <script>
         let user_id = document.getElementById("user_id").value
         let timer = null;
@@ -174,6 +182,11 @@
             window.sessionStorage.removeItem([`Time:${user_id}`])
             updateTime();
         }
+
+        function test() {
+
+        }
+
 
         // 初期ポイントを取得して表示
         function fetchPoints() {

@@ -14,8 +14,14 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = random.random()
+login_manager = LoginManager()
+login_manager.init_app(app)
 app.secret_key = 'timer'
-app.permanent_session_lifetime = timedelta(minutes=5)  # -> 5分 #(days=5) -> 5日保存
+app.permanent_session_lifetime = timedelta(minutes=60)  # -> 5分 #(days=5) -> 5日保存
+
+
+login_manager.login_message = "おかえりさない！ログインを行ってください。"
+
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -104,7 +110,7 @@ def login():
             flash('ログイン成功しました！', 'success')
             return redirect(url_for('Home'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('ログインに失敗しました。再度ログインを実行してください', 'danger')
             print("test")
     return render_template('register_rewords/login.html') 
 
@@ -213,4 +219,6 @@ def stopwatch():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=True)
+
+   # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
