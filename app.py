@@ -1,13 +1,14 @@
 import json
 from datetime import timedelta, datetime
 
-from flask import Flask, jsonify, render_template, flash, url_for
+from flask import Flask, jsonify, render_template, flash, url_for, flash
 from flask import request, redirect, session
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import random,os
+import logging
 
 
 app = Flask(__name__)
@@ -60,6 +61,13 @@ class Reword(db.Model):
 points = 0
 
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
 @app.route('/')
 @login_required
 def Home():
@@ -74,7 +82,13 @@ def Home():
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-    return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr, today_points=today_points, total_points=total_points)
+        return render_template(
+        'home/index.html', 
+        small_reword=json.dumps(small_reword_arr), 
+        big_reword=big_reword_arr, 
+        today_points=today_points, 
+        total_points=total_points)
+    #return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr, today_points=today_points, total_points=total_points)
 
 def check_date(user_history):
     
@@ -83,11 +97,6 @@ def check_date(user_history):
         return True
     else:
         return False
-    
-
-@app.route('/signup', methods=['GET'])
-def sign():
-    return render_template('register_rewords/signup.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -98,6 +107,10 @@ def signup():
         db.session.add(user)
         db.session.commit()
         return redirect('login')
+
+@app.route('/signup', methods=['GET'])
+def sign():
+    return render_template('register_rewords/signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -120,11 +133,6 @@ def logout():
     logout_user()  # ログアウト処理
     flash('You have been logged out!', 'info')  # フラッシュメッセージでログアウト完了を通知
     return redirect(url_for('Home'))  # ホームページにリダイレクト
-
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-
 
 @app.route('/add_points', methods=['POST'])
 @login_required
@@ -162,6 +170,10 @@ def get_points():
         db.session.commit()
     return jsonify({'points': user.points})
 
+@app.route('/clear_cache')
+def clear_cache():
+    session.clear()  # セッションをクリア
+    return redirect(url_for('Home'))  # トップページにリダイレクト
 
 @app.route('/add', methods=['GET'])
 @login_required
@@ -217,8 +229,51 @@ def stopwatch():
     user_id = current_user.get_id()
     return render_template('register_rewords/stopwatch.html', user_id=user_id)
 
+@app.route('/test_points', methods=['POST'])
+def test_add_points():
+    global points
+    try:
+        points += 1000
+        logger.info(f"ポイントが付与されました。現在のポイント: {points}")
+        flash("1000ポイントを付与しました", "success")
+    except Exception as e:
+        logger.error(f"ポイント付与中にエラーが発生しました: {e}")
+        flash('ポイントの付与に失敗しました。再度お試しください。', 'danger')
+    finally:
+         return redirect(url_for('Home'))
 
 if __name__ == '__main__':
     app.run(debug=True)
 
    # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+
+
+
+
+#fix：バグ修正
+#hotfix：クリティカルなバグ修正
+#add：新規（ファイル）機能追加
+#update：機能修正（バグではない）
+#change：仕様変更
+#clean：整理（リファクタリング等）
+#disable：無効化（コメントアウト等）
+#remove：削除（ファイル）
+#upgrade：バージョンアップ
+#revert：変更取り消し
+
+
+#タスクファイルなどプロダクションに影響のない修正
+#docs
+#ドキュメントの更新
+#feat
+#ユーザー向けの機能の追加や変更
+#fix
+#ユーザー向けの不具合の修正
+#refactor
+#リファクタリングを目的とした修正
+#style
+#フォーマットなどのスタイルに関する修正
+#test
+#テストコードの追加や修正
+#https://chatgpt.com/c/66ee8ed7-5cf8-8003-b075-50e6fe5e95b0

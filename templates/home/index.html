@@ -34,7 +34,7 @@
     </style>
     <div class="container my-5">
         <h1 class="text-center mb-4 text-primary">ウハウハご褒美タイム</h1>
-        
+
         <div class="card border-info mx-auto mb-4" style="max-width: 600px;">
             <div class="card-header text-center bg-info text-white">
                 今日の勉強ポイントを計算しよう
@@ -116,6 +116,8 @@
             return 70; // 例として1200ポイントとする
         }
 
+
+
         function calculatePoints() {
             const studyTime = fetchStudyTime();
             const todayPoints = studyTime ? parseInt(studyTime) : 0;
@@ -127,6 +129,18 @@
 
             displayRewards(todayPoints);
         }
+
+        function fetchPoints() {
+            fetch('/get_points')  // サーバー側から最新のポイントを取得するエンドポイント
+                .then(response => response.json())
+                .then(data => {
+                    // ポイントを表示する部分に反映
+                    document.getElementById('todayPoints').innerText = data.today_points;  // 今日のポイント
+                    document.getElementById('totalPoints').innerText = data.total_points;  // 総合ポイント
+                })
+                .catch(error => console.error('ポイント取得エラー:', error));
+        }
+
 
         function displayRewards(points) {
             var small_reword_arr = JSON.parse("{{small_reword_arr}}")
@@ -156,6 +170,10 @@
         // ページ読み込み時に自動的にポイントを計算
         document.addEventListener('DOMContentLoaded', () => {
             calculatePoints();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPoints();
         });
     </script>
 

@@ -44,7 +44,7 @@
             margin: 10px;
             border: none;
             border-radius: 8px;
-            background-color: #007BFF;
+            background-color: #1e023d;
             color: white;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(16, 15, 15, 0.2);
@@ -87,6 +87,11 @@
             background-color: #dc3545;
         }
 
+        button#start {
+            background-color: #0015ff;
+        }
+
+
         button#stop:hover {
             background-color: #c82333;
         }
@@ -94,11 +99,6 @@
         button#reset {
             background-color: #199e5c;
         }
-
-        button#reset:hover {
-            background-color: #401262;
-        }
-        
     </style>
 </head>
 
@@ -109,14 +109,14 @@
         <button id="start" onclick="start()">start</button>
         <button id="stop" onclick="stop()">stop</button>
         <button id="reset" onclick="reset()">reset</button>
-        <form action="/test_point" method="POST">
-            <button type="submit"><i class="bi bi-plus-circle"></i> 1000ポイント付与</button>
+        <form action="/test_points" method="POST">
+            <button type="submit"><i class="bi bi-plus-circle bs-warning-rgb"></i> 1000ポイント付与</button>
         </form>
         <!--<button id="admin" onclick="reset()">test</button> -->
     </div>
     <div id="points">ポイント: 0</div>
     <input type="hidden" value="{{user_id}}" id="user_id">
-    
+
 
 
 
@@ -153,6 +153,16 @@
                 })
                 .catch(error => console.error('ポイントの追加に失敗しました:', error));
         }
+
+        function fetchPoints() {
+            fetch('/test_add_points')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = data.points;
+                })
+                .catch(error => console.error('ポイントの取得に失敗しました:', error));
+        }
+
 
         function start() {
             if (!timer) {
