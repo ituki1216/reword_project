@@ -1,130 +1,244 @@
+import json
+from datetime import timedelta, datetime
 
-
-
-from flask import Flask, render_template, request, redirect, url_for # flask(ルート機能を定義), render_template(htmlファイルを表示するため), request(ユーザーがデータベースに情報を送る), ridirect(とあるページから別のページに移動したいときに使用), url_for(関数名を使用して動的にURLを生成する)
-from flask_sqlalchemy import SQLAlchemy # sqlalchemy(データベース操作を簡単に行う)
-from flask_migrate import Migrate # Migrate(データテーブルを変更、追加、削除したときにそのデータを反映させるためのもの)
-from datetime import datetime # datetime(現在の日付を取得)
-from datetime import timedelta # deltatime(経過日時を取得)
-import random # random(乱数を生成するためのモジュール)
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, Length
+from flask import Flask, jsonify, render_template, flash, url_for
+from flask import request, redirect, session
+from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_caching import Cache
+import random,os
+import logging
+import pytest
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = random.random()
+login_manager = LoginManager()
+login_manager.init_app(app)
+csrf = CSRFProtect(app)
+app.permanent_session_lifetime = timedelta(minutes=60)  # -> 5分 #(days=5) -> 5日保存
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
+
+
+login_manager.login_message = "おかえりさない！ログインを行ってください。"
+
 
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
 migrate = Migrate(app, db)
 
 
-class Reword(db.Model): # データベースの作成 
-    id = db.Column(db.Integer, primary_key=True) 
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True) #primaryは連番かつ一意な値 データベースの**主キー（primary key）**として設定されたフィールドが、各レコードごとに一意な（他のレコードと重複しない）値を持ち、さらにその値が連続して増加することを指します。以下に詳しく説明します。
+    name = db.Column(db.String(30), nullable=False)
+    mail_address = db.Column(db.String(140), nullable=False, unique=True, index=True)
+    points = db.relationship('UserPoints', backref='user', uselist=False)
+    rewards = db.relationship('Reward', backref='user', lazy=True)
+    points_history = db.relationship('UserPointsHistory', backref='user', lazy=True)
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField('Login')
+    
+class UserPoints(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    points = db.Column(db.Integer, default=0)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class UserPointsHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    points = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class Reword(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     reword_kind = db.Column(db.Boolean)
     description = db.Column(db.String(200))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow) # エラーなぜ？
-    start_week = db.Column(db.DateTime, nullable=False) 
-    double_point_day = db.Column(db.DateTime, nullable=False)
-
-class WeeklyConfig(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    start_of_week_ = db.Column(db.DateTime, nullable=False)
-    double_point_of_day = db.Column(db.DateTime, nullable=False)   
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    point = db.Column(db.Integer)
 
 
-# 一週間の始まりを㈪とする
-def get_start_week(date): # dateを引数とて受け取り週の始まりを計算
-    start = date - timedelta(days=date. weekday()) # 現在の日付からその日が週の何日目かを計算(-)して始まりを計算
-    return start # 計算した週の開始日を返す
+points = 0
 
-#　ランダムでポイント2倍dayを決定
-#def double_point_day(start_week):
-    #random_double_day = random.randint(0, 6) # 一週間のうランダムに2倍の火を7日間の中から決定
-    #return start_week + timedelta(days=random_double_day) #週の初めにランダムな日を返す 
 
-def determine_double_point_day(start_week):
-    random_double_day = random.randint(0, 6)  # 0から6のランダムな数を生成し、週の中でポイント2倍の火を決定
-    return start_week + timedelta(days=random_double_day)  # 週の開始日 + ランダムな日数を返す
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# 特定の週の開始日にポイントを２倍にして、データベースに取得、保存
-# 週に開始日時を取得
-today = datetime.utcnow() # 現在の日時を取得
-start_week = get_start_week(today) # 今日が属している州の始まりを取得
-# ランダムで2倍の日を取得
-double_point_day = determine_double_point_day(start_week) 
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
-def set_double_point_day(): # 今日の日付をもとに、その週の２倍の火を取得 else設定
-    today = datetime.utcnow() # 現在の日付を取得
-    start_week = get_start_week(today) # 現在の日付をもとに今日が属する週の初めを取得 
-    weekly_config = WeeklyConfig.query.filter_by(start_week=start_week).first() # その週の規定が存在するか否かfilter(検索)
-    if weekly_config: # もしあれば
-          return weekly_config.double_point_day # その週を２倍に
-    else: # もしなければ
-        double_point_day = determine_double_point_day(start_week) #週の開始日をもとにランダムな２倍dayを設定し直す
-        new_weekly_config = WeeklyConfig(start_week=start_week, double_point_day=double_point_day) #現在の週の設定がデータベースにあるか確認し、なければ設定をつくる
-        db.session.add(new_weekly_config) # 作った設定をデータベースに追加
-        db.session.commit() # dbにコミット
-        return double_point_day # double_point_dayを出力
-        
-#勉強時間に基づいて計算
-def calculate_points(study_minute): 
-    today = datetime.utcnow() #本日の日付を取得
-    double_point_day = set_double_point_day() # 今週のポイント2倍dayを取得
-    point = study_minute  # 勉強時間に基づくポイント（1分あたり1ポイント
-    if today.date() == double_point_day.date(): # もし今日がポイント2倍dayならpoint=*2
-        point *= 2
-    return point
+def client():
+    app = create_app()
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 
-# テスト
-study_minute = 1234  # 例えば、120分勉強した場合
-point = calculate_points(study_minute)
-print(f"取得ポイント: {point}")
+    with app.test_client() as client:
+        with app.app_client():
+            db.create_all()
+        yield client
 
-   
+def test_signup(client):
+    response = client.post('/signup', data={
+        'name': 'testuser',
+        'mail_address': 'test@example.com',
+        'password': 'password'
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    user = User.query.filter_by(mail_address='test@example.com').first()
+    assert user is not None
 
-@app.route('/') # toppageにアクセスされたときにHome関数を実行するよ！！！あは！ (現在時刻2024/09/04/15:23:35) はーむずすぎてちぬ
-def Home(): # ユーザーに見せるホームページにまつわる関数
-    double_point_day = set_double_point_day() # ポイント２倍dayを設定
-    small_reword_arr = [] # 空のリストであり報酬を格納するためのリスト
-    big_reword_arr = [] # 上同様、空のリストであり報酬を格納する
-    small_reword = Reword.query.filter(Reword.reword_kind == 0) # small_rewordはrewordデータベースから0を取り出しsmallとする
+@app.route('/')
+@login_required
+def Home():
+    small_reword_arr = []
+    big_reword_arr = []
+    user_id = current_user.get_id()
+    total_points = UserPoints.query.filter(UserPoints.user_id==user_id).first()
+    small_reword = Reword.query.filter(Reword.reword_kind == 0)
+    today_points = UserPointsHistory.query.filter(UserPointsHistory.user_id==user_id, UserPointsHistory.created_at >= datetime.now().date(), UserPointsHistory.created_at < datetime.now().date() +timedelta(days=1)).first()
     for data in small_reword:
-        small_reword_arr.append({'name':data.name, 'timestamp': data.timestamp}) # 小さなご褒美をデータベースから取得する
+        small_reword_arr.append(data.name)
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
-    for data in big_reword:    
-        big_reword_arr.append({'name': data.name, 'timestamp': data.timestamp}) # 上に同じ大きなご褒美を取得する
-    return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr, double_point_day=double_point_day) # strftime('%A, %B %d, %Y')) 今日が2倍point dayならtopページに表示を行う
+    for data in big_reword:
+        big_reword_arr.append(data.name)
+    return render_template(
+        'home/index.html', 
+        small_reword=json.dumps(small_reword_arr), 
+        big_reword=big_reword_arr, 
+        today_points=today_points, 
+        total_points=total_points)
+    #return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr, today_points=today_points, total_points=total_points)
 
-       # big_reword_arr.append(data.name) # 上に同じ大きなご褒美を取得する
-        #return render_template('home/index.html', small_reword=small_reword_arr, big_reword=big_reword_arr) # 今日が2倍point dayならtopページに表示を行う
+def check_date(user_history):
+    
+    today = datetime.now().date()
+    if today == user_history.created_at.date():
+        return True
+    else:
+        return False
 
-@app.route('/', methods=['POST']) # ユーザーからpostされたデータをrewordに追加
-def add():
-    reword_kind = False # reword_kindの変数を初期化
-    print(request.form) # 弟馬具用
-    if  request.form.get('reword_kind'): # もしれクエストがreword_kindならTRUE 大きなご褒美とする
-        reword_kind = True
-    reword_text = request.form['reword'] # rewordの名前はformのrewordを参照
-    new_reword = Reword(name = reword_text, reword_kind = reword_kind) # Userから受け取ったrewordの名前、種類はそれぞれreword_text, rewird_kindとする)
-    db.session.add(new_reword) # 追加されたrewordをデータベースに追加し
-    db.session.commit() # commitする
-    return redirect("/add") # Userにはadd画面に戻ってもらう
-    
-@app.route('/add', methods=['GET'])
-def hello_world(): # /addにUserがアクセスしたときに以下の関数が実行される
-    small_reword = Reword.query.filter(Reword.reword_kind == 0) # rewordというテーブルから条件にあうrewordを取得(reword == 0)
-    big_reword = Reword.query.filter(Reword.reword_kind == 1) # rewordのクエリーの条件検索(reword == 1)を取得
-    return render_template('register_rewords/index.html',small_reword=small_reword, big_reword=big_reword) # topページに返すとともに small_reword=small_reword, big_reword=big_rewordデータをわたす
-    
-@app.route('/delete', methods=['POST']) 
-def delete():
-    id = request.form["id"]
-    record_to_delete = Reword.query.filter_by(id=id).first()
-    db.session.delete(record_to_delete)
+@app.route('/signup', methods=['POST'])
+def signup():
+        username = request.form.get('name')        
+        password = request.form.get('password')
+        mail_address = request.form.get('mail_address')
+        user = User(name=username, mail_address=mail_address, password=generate_password_hash(password))
+        db.session.add(user)
+        db.session.commit()
+        return redirect('login')
+
+@app.route('/signup', methods=['GET'])
+def sign():
+    return render_template('register_rewords/signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get("email")
+        password = request.form.get("password")
+        user = User.query.filter_by(mail_address=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            flash('ログイン成功しました！', 'success')
+            return redirect(url_for('Home'))
+        else:
+            flash('ログインに失敗しました。再度ログインを実行してください', 'danger')
+            print("test")
+    return render_template('register_rewords/login.html') 
+
+@app.route('/logout')
+@login_required  # ログインしている場合のみアクセス可能
+def logout():
+    logout_user()  # ログアウト処理
+    flash('You have been logged out!', 'info')  # フラッシュメッセージでログアウト完了を通知
+    return redirect(url_for('Home'))  # ホームページにリダイレクト
+
+@app.route('/add_points', methods=['POST'])
+@login_required
+def add_points():
+    user_id = current_user.get_id()
+    user = UserPoints.query.filter(UserPoints.user_id==user_id).first()  # 仮に1人のユーザーとして扱う場合
+    user_history = UserPointsHistory.query.filter(
+    UserPointsHistory.user_id == user_id,
+    UserPointsHistory.created_at >= datetime.now().date(),
+    UserPointsHistory.created_at < (datetime.now().date() + timedelta(days=1))
+).first()
+    if user_history is None:
+        print('Aaa')
+        user_history = UserPointsHistory(user_id=user_id, points=1)
+    else:
+        print(user_history.points)
+        if check_date(user_history):
+            user_history.points += 1
+    user.points += 1  # 1ポイントを加算
+    db.session.add(user)
+    db.session.add(user_history)
     db.session.commit()
-    return redirect("/add")
+    return jsonify({'points': user.points})  # 最新のポイントを返す
+
+
+@app.route('/get_points', methods=['GET'])
+@login_required
+def get_points():
+    user_id = current_user.get_id()
+    print(UserPointsHistory.query.first().points)
+    user = UserPoints.query.filter(UserPoints.user_id==user_id).first() # 仮に1人のユーザーとして扱う場合 
+    if user is None:
+        user = UserPoints(points=0, user_id=user_id)
+        db.session.add(user)
+        db.session.commit()
+    return jsonify({'points': user.points})
+
+@app.route('/clear_cache')
+def clear_cache():
+    session.clear()  # セッションをクリア
+    return redirect(url_for('Home'))  # トップページにリダイレクト
+
+@app.route('/small_reword', methods=['GET'])
+@login_required
+def get_small_reword():
+    user_id = current_user.get_id()
+    rewords = []
+    user_points = UserPoints.query.filter_by(user_id=user_id).first()
+    small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id()).all()
+    print(user_points.points)
+    for reword in small_reword:
+        if int(user_points.points) >= int(reword.point):
+            rewords.append(reword.name)
+    if len(rewords):
+        select_reword = rewords[random.randrange(0, len(rewords)-1)]
+        small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id(), Reword.name == select_reword).first()
+        calc_points = user_points.points - small_reword.point
+        user_points.points = calc_points
+        db.session.commit()
+        return jsonify({'reword': select_reword})
+    return[]
+
+@app.route('/add', methods=['GET'])
+@login_required
+def add_get():
+    small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id())
+    big_reword = Reword.query.filter(Reword.reword_kind == 1, Reword.user_id == current_user.get_id())
+    return render_template('register_rewords/index.html', small_reword=small_reword, big_reword=big_reword)
+
 
 @app.route('/update', methods=['POST'])
+@login_required
 def update():
     id = request.form["id"]
     name = request.form["reword"]
@@ -133,6 +247,87 @@ def update():
     db.session.commit()
     return redirect("/add")
 
+
+@app.route('/delete', methods=['POST'])
+@login_required
+def delete():
+    id = request.form["id"]
+    record_to_delete = Reword.query.filter_by(id=id).first()
+    db.session.delete(record_to_delete)
+    db.session.commit()
+    return redirect("/add")
+
+
+@app.route('/create', methods=['POST'])
+@login_required
+def add():
+    reword_kind = False
+    if request.form.get('reword_kind') is not None:
+        reword_kind = True
+        points = random.randrange(300, 1000)
+    else:
+        reword_kind = False
+        points = 0 #random.randrange(0, 1)
+    reword_text = request.form['reword']
+    user_id = current_user.get_id()
+    new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
+    db.session.add(new_reword)
+    print(user_id, points)
+    db.session.commit()
+    return redirect("/add")
+
+
+@app.route('/stopwatch')
+@login_required
+def stopwatch():
+    user_id = current_user.get_id()
+    return render_template('register_rewords/stopwatch.html', user_id=user_id)
+
+@app.route('/test_points', methods=['POST'])
+def test_add_points():
+    global points
+    try:
+        points += 1000
+        logger.info(f"ポイントが付与されました。現在のポイント: {points}")
+        flash("1000ポイントを付与しました", "success")
+    except Exception as e:
+        logger.error(f"ポイント付与中にエラーが発生しました: {e}")
+        flash('ポイントの付与に失敗しました。再度お試しください。', 'danger')
+    finally:
+         return redirect(url_for('Home'))
+
 if __name__ == '__main__':
     app.run(debug=True)
 
+   # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+
+
+
+
+#fix：バグ修正
+#hotfix：クリティカルなバグ修正
+#add：新規（ファイル）機能追加
+#update：機能修正（バグではない）
+#change：仕様変更
+#clean：整理（リファクタリング等）
+#disable：無効化（コメントアウト等）
+#remove：削除（ファイル）
+#upgrade：バージョンアップ
+#revert：変更取り消し
+
+
+#タスクファイルなどプロダクションに影響のない修正
+#docs
+#ドキュメントの更新
+#feat
+#ユーザー向けの機能の追加や変更
+#fix
+#ユーザー向けの不具合の修正
+#refactor
+#リファクタリングを目的とした修正
+#style
+#フォーマットなどのスタイルに関する修正
+#test
+#テストコードの追加や修正
+#https://chatgpt.com/c/66ee8ed7-5cf8-8003-b075-50e6fe5e95b0
