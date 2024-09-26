@@ -1,7 +1,7 @@
 import json
 from datetime import timedelta, datetime
 
-from flask import Flask, jsonify, render_template, flash, url_for, flash
+from flask import Flask, jsonify, render_template, flash, url_for
 from flask import request, redirect, session
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
