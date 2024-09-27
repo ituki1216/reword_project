@@ -16,39 +16,31 @@ import random
 import os
 import logging
 
-# 環境変数からSECRET_KEYを取得し、存在しない場合はランダムに生成
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', os.urandom(24))
-app.permanent_session_lifetime = timedelta(minutes=60)  # セッションの有効期限を60分に設定
+app.permanent_session_lifetime = timedelta(minutes=60)  
 
-# Flask-Loginの設定
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "おかえりなさい！ログインを行ってください。"
 
-# Flask-Cachingの設定
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
-# CSRF保護の設定
 csrf = CSRFProtect(app)
 
-# データベースの初期化
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# ロギングの設定
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# ユーザーロード関数
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# モデルの定義
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(30), nullable=False)
@@ -61,7 +53,7 @@ class User(UserMixin, db.Model):
 class Reward(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    reward_kind = db.Column(db.Boolean, nullable=False)  # reword_kindからreward_kindに修正
+    reward_kind = db.Column(db.Boolean, nullable=False) 
     description = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     point = db.Column(db.Integer, nullable=False)
@@ -74,21 +66,18 @@ class UserPoints(db.Model):
 class UserPointsHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     points = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # datetime.now()からdatetime.utcnowに変更
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-# フォームの定義
+    
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     submit = SubmitField('Login')
 
-# エラーハンドリングの例
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
 
-# ルートの定義
 @app.route('/')
 @login_required
 def home():
@@ -96,7 +85,6 @@ def home():
     big_reward_arr = []
     user_id = current_user.get_id()
     
-    # ユーザーのポイントを取得または初期化
     user_points = UserPoints.query.filter_by(user_id=user_id).first()
     if not user_points:
         user_points = UserPoints(user_id=user_id, points=0)
@@ -105,14 +93,12 @@ def home():
     
     total_points = user_points.points
     
-    # 小さな報酬と大きな報酬を取得
     small_rewards = Reward.query.filter_by(reward_kind=False, user_id=user_id).all()
     big_rewards = Reward.query.filter_by(reward_kind=True, user_id=user_id).all()
     
     small_reward_arr = [reward.name for reward in small_rewards]
     big_reward_arr = [reward.name for reward in big_rewards]
     
-    # 今日のポイント履歴を取得
     today = datetime.utcnow().date()
     tomorrow = today + timedelta(days=1)
     today_points = UserPointsHistory.query.filter(
@@ -140,7 +126,6 @@ def signup():
         password = request.form.get('password')
         mail_address = request.form.get('mail_address')
         
-        # メールアドレスの重複チェック
         if User.query.filter_by(mail_address=mail_address).first():
             flash('このメールアドレスは既に使用されています。', 'danger')
             return redirect(url_for('sign'))
@@ -151,7 +136,6 @@ def signup():
         db.session.add(user)
         db.session.commit()
         
-        # ユーザーのポイントと履歴を初期化
         user_points = UserPoints(user_id=user.id, points=0)
         user_history = UserPointsHistory(user_id=user.id, points=0)
         db.session.add(user_points)
@@ -167,7 +151,7 @@ def signup():
 
 @app.route('/signup', methods=['GET'])
 def sign():
-    return render_template('register_rewards/signup.html')  # テンプレート名もRewordからRewardに修正
+    return render_template('register_rewards/signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -182,14 +166,14 @@ def login():
             return redirect(url_for('home'))
         else:
             flash('ログインに失敗しました。再度ログインを実行してください', 'danger')
-    return render_template('register_rewards/login.html', form=form)  # テンプレート名もRewordからRewardに修正
+    return render_template('register_rewards/login.html', form=form)  
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('You have been logged out!', 'info')
-    return redirect(url_for('login'))  # ホームページではなくログインページにリダイレクト
+    return redirect(url_for('login'))  
 
 @app.route('/add_points', methods=['POST'])
 @login_required
@@ -217,7 +201,7 @@ def add_points():
         if check_date(user_history):
             user_history.points += 1
     
-    user_points.points += 1  # 1ポイントを加算
+    user_points.points += 1 
     
     db.session.add(user_points)
     db.session.add(user_history)
@@ -243,8 +227,7 @@ def clear_cache_route():
     session.clear()
     return redirect(url_for('home'))
 
-@app.route('/small_reward', methods=['GET'])  # rewordからrewardに修正
-@login_required
+@app.route('/small_reward', methods=['GET']) 
 def get_small_reward():
     user_id = current_user.get_id()
     user_points = UserPoints.query.filter_by(user_id=user_id).first()
@@ -321,7 +304,7 @@ def create_reward():
         if reward_kind:
             points = random.randint(300, 1000)
         else:
-            points = 0  # 固定ポイントの場合は適宜設定
+            points = 0 
         
         reward_text = request.form.get('reward')
         user_id = current_user.get_id()
@@ -370,11 +353,7 @@ def test_add_points():
     finally:
         return redirect(url_for('home'))
 
-# テストコードは別ファイルにすることを推奨します
-# 例: tests/test_app.py
 
 if __name__ == '__main__':
-    # デバッグモードは開発時のみ有効にし、本番環境では無効にすること
     app.run(debug=True)
-    # 本番環境での実行例:
     # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
