@@ -233,7 +233,7 @@ def add():
         points = random.randrange(300, 1000)
     else:
         reword_kind = False
-        points = 0 #random.randrange(0, 1)
+        points = random.randrange(0, 1)
     reword_text = request.form['reword']
     user_id = current_user.get_id()
     new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
@@ -263,9 +263,10 @@ def test_add_points():
          return redirect(url_for('Home'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    #app.run(debug=True)
 
-   # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+  
 
 
 
