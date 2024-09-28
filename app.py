@@ -95,7 +95,7 @@ def Home():
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-    return render_template(
+        return render_template(
         'home/index.html', 
         small_reword=json.dumps(small_reword_arr), 
         big_reword=big_reword_arr, 
@@ -316,8 +316,8 @@ def test_add_points():
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
-   # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    #app.run(debug=True)
 
 
 
