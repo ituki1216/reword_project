@@ -95,7 +95,7 @@ def Home():
     big_reword = Reword.query.filter(Reword.reword_kind == 1)
     for data in big_reword:
         big_reword_arr.append(data.name)
-        return render_template(
+    return render_template(
         'home/index.html', 
         small_reword=json.dumps(small_reword_arr), 
         big_reword=big_reword_arr, 
