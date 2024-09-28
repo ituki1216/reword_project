@@ -1,6 +1,9 @@
 import json
 from datetime import timedelta, datetime
 
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask import Flask, jsonify, render_template, flash, url_for
 from flask import request, redirect, session
 from flask_migrate import Migrate
@@ -25,9 +28,7 @@ login_manager.login_message = "おかえりさない！ログインを行って�
 
 
 db = SQLAlchemy(app)
-login_manager = LoginManager()
 login_manager.login_view = 'login'
-login_manager.init_app(app)
 migrate = Migrate(app, db)
 
 
@@ -37,6 +38,18 @@ class User(UserMixin, db.Model):
     mail_address = db.Column(db.String(140), nullable=False, unique=True) #uniqueデータベースのフィールドに対して一意制約を設けるためのオプションです。これにより、そのフィールドの値が他のレコードと重複しないように強制されます
     password = db.Column(db.String(120)) #hash化する可能性ある１２０
 
+class SignupForm(FlaskForm): #CRSF対策
+    name = StringField('Name', validators=[DataRequired(), Length(max=20)])
+    mail_address = StringField('Email', validators=[DataRequired(), Email(), Length(max=100)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=140)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
 
 class UserPoints(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,19 +111,36 @@ def check_date(user_history):
     else:
         return False
 
-@app.route('/signup', methods=['POST']) #データベースにcurrent_userの情報を送信する
+
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if request.method == 'POST':
         username = request.form.get('name')        
         password = request.form.get('password')
         mail_address = request.form.get('mail_address')
-        user = User(name=username, mail_address=mail_address, password=generate_password_hash(password))
-        db.session.add(user)
-        db.session.commit()
-        return redirect('login')
 
-@app.route('/signup', methods=['GET'])
-def sign():
+        # メールアドレスの重複をチェック
+        existing_user = User.query.filter_by(mail_address=mail_address).first()
+        if existing_user:
+            flash('このメールアドレスは既に登録されています。', 'error')
+            return render_template('register_rewords/signup.html', name=username, mail_address=mail_address)
+
+        # 新しいユーザーを作成
+        hashed_password = generate_password_hash(password)
+        user = User(name=username, mail_address=mail_address, password=hashed_password)
+        db.session.add(user)
+        try:
+            db.session.commit()
+            flash('登録が完了しました。ログインしてください。', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash('登録中にエラーが発生しました。もう一度お試しください。', 'error')
+            return render_template('register_rewords/signup.html')
+
+    # GETリクエストの場合、サインアップフォームを表示
     return render_template('register_rewords/signup.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -255,11 +285,7 @@ def add():
         points = random.randrange(1, 2)
     else:
         reword_kind = False
-<<<<<<< HEAD
-        points =  random.randrange(3, 4)
-=======
-        points = random.randrange(0, 1)
->>>>>>> 101638a6623d9f00155ba4d7142c7011978b57cd
+        points =  random.randrange(3, 5)
     reword_text = request.form['reword']
     user_id = current_user.get_id()
     new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
@@ -281,7 +307,7 @@ def test_add_points():
     try:
         points += 1000
         logger.info(f"ポイントが付与されました。現在のポイント: {points}")
-        flash("1000ポイントを付与しました", "success")
+        flash("1000ポイントを付与しました。", "success")
     except Exception as e:
         logger.error(f"ポイント付与中にエラーが発生しました: {e}")
         flash('ポイントの付与に失敗しました。再度お試しください。', 'danger')
@@ -290,15 +316,8 @@ def test_add_points():
     
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run(debug=True)
    # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-=======
-     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-    #app.run(debug=True)
-
-  
->>>>>>> 101638a6623d9f00155ba4d7142c7011978b57cd
 
 
 
