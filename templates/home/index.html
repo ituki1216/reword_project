@@ -99,8 +99,8 @@
                 目標に向かって頑張ろう！
             </div>
             <div class="card-body text-center">
-                <p class="mb-0">1週間の目標時間: <strong></strong></p>
-                <p>進捗状況: <span class="text-primary"></span> / </p>
+                <p class="mb-0">1週間の目標時間:1000分 <strong></strong></p>
+                <p>進捗状況: <span id="elapsedTime" class="text-primary"></span> 分 / </p>
             </div>
         </div>
     </div>
@@ -132,6 +132,21 @@
                     }
                     else{
                     document.getElementById("smallReword").innerText = "ポイントが足りません。。。。"
+                    console.log(data)
+                    }
+                })
+                .catch(error => console.error('ポイント取得エラー:', error));
+        }
+        
+        function calculatePoints() {
+            fetch('/big_reword')  
+                .then(response => response.json())
+                .then(data => {
+                    if(data.reword){
+                        document.getElementById("largeReward").innerText = data.reword
+                    }
+                    else{
+                    document.getElementById("largeReward").innerText = "ポイントが足りません。。。。"
                     console.log(data)
                     }
                 })
@@ -174,6 +189,22 @@
                 largeRewardList.innerHTML += `<div class="list-group-item text-center">${randomLargeReward}</div>`;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            //サーバーサイドからユーザーIDを取得
+            let user_id = "{{ current_user.get_id() }}";
+
+            function updateElapsedTime() {
+                let timeInSeconds = parseInt(localStorage.getItem(`Time:${user_id}`)) || 0;
+                let timeInMinutes = Math.floor(timeInSeconds / 60);
+                document.getElementById('elapsedTime').textContent = `${timeInMinutes}`;
+            }
+            //最初表示
+            updateElapsedTime();
+            
+            //定期的に更新
+            setInterval(updateElapsedTime, 60)
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchPoints();

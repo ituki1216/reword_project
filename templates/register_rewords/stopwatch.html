@@ -151,7 +151,7 @@
         }
 
         function updateTime() {
-            let time = parseInt(window.sessionStorage.getItem(`Time:${user_id}`)) || 0;
+            let time = parseInt(window.localStorage.getItem(`Time:${user_id}`)) || 0;
             document.getElementById('time').textContent = formatTime(time);
         }
 
@@ -177,9 +177,9 @@
         function start() {
             if (!timer) {
                 timer = setInterval(() => {
-                    let currentTime = parseInt(window.sessionStorage.getItem(`Time:${user_id}`)) || 0;
+                    let currentTime = parseInt(window.localStorage.getItem(`Time:${user_id}`)) || 0;
                     currentTime += 1;
-                    window.sessionStorage.setItem(`Time:${user_id}`, currentTime);
+                    window.localStorage.setItem(`Time:${user_id}`, currentTime);
                     updateTime();
 
                     if (currentTime % 60 === 0 && currentTime !== 0) {
@@ -197,7 +197,7 @@
 
         function reset() {
             stop();
-            window.sessionStorage.removeItem(`Time:${user_id}`);
+            window.localStorage.removeItem(`Time:${user_id}`);
             updateTime();
             document.getElementById('cat-container').innerHTML = ''; 
         }

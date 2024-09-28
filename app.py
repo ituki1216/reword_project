@@ -231,14 +231,14 @@ def get_big_reword():
     user_id = current_user.get_id()
     rewords = []
     user_points = UserPoints.query.filter_by(user_id=user_id).first()
-    big_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id()).all()
+    big_reword = Reword.query.filter(Reword.reword_kind == 1, Reword.user_id == current_user.get_id()).all()
     print(user_points.points)
     for reword in big_reword:
         if int(user_points.points) >= int(reword.point):
             rewords.append(reword.name)
     if len(rewords):
         select_reword = rewords[random.randrange(0, len(rewords)-1)]
-        big_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id(), Reword.name == select_reword).first()
+        big_reword = Reword.query.filter(Reword.reword_kind == 1, Reword.user_id == current_user.get_id(), Reword.name == select_reword).first()
         calc_points = user_points.points - big_reword.point
         user_points.points = calc_points
         db.session.commit()
@@ -282,10 +282,10 @@ def add():
     reword_kind = False
     if request.form.get('reword_kind') is not None:
         reword_kind = True
-        points = random.randrange(1, 2)
+        points = 0 #random.randrange(1, 2)
     else:
         reword_kind = False
-        points =  random.randrange(3, 5)
+        points =  random.randrange(1, 2)
     reword_text = request.form['reword']
     user_id = current_user.get_id()
     new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
