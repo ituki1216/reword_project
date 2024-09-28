@@ -1,7 +1,7 @@
 import json
 from datetime import timedelta, datetime
 
-from flask import Flask, jsonify, render_template, flash, url_for, flash
+from flask import Flask, jsonify, render_template, flash, url_for
 from flask import request, redirect, session
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -18,7 +18,7 @@ app.config['SECRET_KEY'] = random.random()
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.secret_key = 'timer'
-app.permanent_session_lifetime = timedelta(minutes=60)  # -> 5分 #(days=5) -> 5日保存
+app.permanent_session_lifetime = timedelta(minutes=60)  # -> 5分 #(days=60) -> 5日保存
 
 
 login_manager.login_message = "おかえりさない！ログインを行ってください。"
@@ -98,7 +98,7 @@ def check_date(user_history):
     else:
         return False
 
-@app.route('/signup', methods=['POST'])
+@app.route('/signup', methods=['POST']) #データベースにcurrent_userの情報を送信する
 def signup():
         username = request.form.get('name')        
         password = request.form.get('password')
@@ -175,7 +175,7 @@ def clear_cache():
     session.clear()  # セッションをクリア
     return redirect(url_for('Home'))  # トップページにリダイレクト
 
-@app.route('/small_reword', methods=['GET'])
+@app.route('/small_reword', methods=['GET']) #topページより送信されたsmall_rewordの情報を取得する
 @login_required
 def get_small_reword():
     user_id = current_user.get_id()
@@ -195,7 +195,29 @@ def get_small_reword():
         return jsonify({'reword': select_reword})
     return[]
 
-@app.route('/add', methods=['GET'])
+@app.route('/big_reword', methods=['GET']) #topページより送信されたsmall_rewordの情報を取得する
+@login_required
+def get_big_reword():
+    user_id = current_user.get_id()
+    rewords = []
+    user_points = UserPoints.query.filter_by(user_id=user_id).first()
+    big_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id()).all()
+    print(user_points.points)
+    for reword in big_reword:
+        if int(user_points.points) >= int(reword.point):
+            rewords.append(reword.name)
+    if len(rewords):
+        select_reword = rewords[random.randrange(0, len(rewords)-1)]
+        big_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id(), Reword.name == select_reword).first()
+        calc_points = user_points.points - big_reword.point
+        user_points.points = calc_points
+        db.session.commit()
+        return jsonify({'reword': select_reword})
+    return[]
+
+
+
+@app.route('/add', methods=['GET']) #addのページより送信された情報を取得して以下の関数を実行する
 @login_required
 def add_get():
     small_reword = Reword.query.filter(Reword.reword_kind == 0, Reword.user_id == current_user.get_id())
@@ -203,7 +225,7 @@ def add_get():
     return render_template('register_rewords/index.html', small_reword=small_reword, big_reword=big_reword)
 
 
-@app.route('/update', methods=['POST'])
+@app.route('/update', methods=['POST']) #Idのアップデートのリクエストをデータベースに送信する
 @login_required
 def update():
     id = request.form["id"]
@@ -214,26 +236,26 @@ def update():
     return redirect("/add")
 
 
-@app.route('/delete', methods=['POST'])
+@app.route('/delete', methods=['POST']) #deleteしたIDの情報をデータベースの送信する
 @login_required
 def delete():
     id = request.form["id"]
-    record_to_delete = Reword.query.filter_by(id=id).first()
+    record_to_delete = Reword.query.filter_by(id=id).first() 
     db.session.delete(record_to_delete)
     db.session.commit()
     return redirect("/add")
 
 
-@app.route('/create', methods=['POST'])
+@app.route('/create', methods=['POST']) #作成したrewordの情報をデータベースに送信する
 @login_required
 def add():
     reword_kind = False
     if request.form.get('reword_kind') is not None:
         reword_kind = True
-        points = random.randrange(300, 1000)
+        points = random.randrange(1, 2)
     else:
         reword_kind = False
-        points = 0 #random.randrange(0, 1)
+        points =  random.randrange(3, 4)
     reword_text = request.form['reword']
     user_id = current_user.get_id()
     new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
@@ -261,10 +283,10 @@ def test_add_points():
         flash('ポイントの付与に失敗しました。再度お試しください。', 'danger')
     finally:
          return redirect(url_for('Home'))
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
-
    # app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 

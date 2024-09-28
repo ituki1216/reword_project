@@ -1,55 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ストップウォッチ</title>
+    <title>スイーツストップウォッチ</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap');
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f8ff;
+            background-image: url('https://imgcp.aacdn.jp/img-a/800/auto/aa/gm/article/4/9/3/6/6/8/202402051621/66580000101.jpg');
+            background-size: cover;
+            background-position: center;
             margin: 0;
             flex-direction: column;
+            backdrop-filter: brightness(0.8);
         }
 
         h1 {
-            color: #333;
+            font-family: 'Pacifico', cursive;
+            color: #fff0f5;
             margin-bottom: 20px;
-            font-size: 2.5em;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         #time {
             font-size: 4em;
             margin: 20px;
-            color: #444;
+            color: #fff;
             font-weight: bold;
             letter-spacing: 2px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
         }
 
         .button-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
         }
 
         button {
-            font-size: 1.5em;
-            padding: 10px 20px;
-            margin: 10px;
+            font-size: 1.2em;
+            padding: 12px 25px;
             border: none;
-            border-radius: 8px;
-            background-color: #1e023d;
-            color: white;
+            border-radius: 25px;
+            background-color: rgba(255, 182, 193, 0.8);
+            color: #4b0082;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(16, 15, 15, 0.2);
-            transition: background-color 0.3s,
-                transform 0.2s;
+            box-shadow: 0 4px 15px rgba(75, 0, 130, 0.3);
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         #cat-container {
@@ -57,21 +67,25 @@
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
+            margin-top: 20px;
         }
 
         .cat {
             width: 100px;
             height: 100px;
             object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         #points {
             font-size: 2em;
-            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: rgba(255, 105, 180, 0.9);
             transform: scale(1.05);
         }
 
@@ -84,46 +98,50 @@
         }
 
         button#stop {
-            background-color: #dc3545;
+            background-color: rgba(255, 99, 71, 0.8);
+            color: #fff;
         }
 
         button#start {
-            background-color: #0015ff;
-        }
-
-
-        button#stop:hover {
-            background-color: #c82333;
+            background-color: rgba(144, 238, 144, 0.8);
+            color: #4b0082;
         }
 
         button#reset {
-            background-color: #199e5c;
+            background-color: rgba(255, 215, 0, 0.8);
+            color: #4b0082;
+        }
+
+        form button {
+            background-color: rgba(255, 160, 122, 0.8);
+            color: #4b0082;
+        }
+
+        form button:hover {
+            background-color: rgba(255, 69, 0, 0.9);
         }
     </style>
 </head>
 
 <body>
-    <h1>ストップウォッチ</h1>
+    <h1>スイーツストップウォッチ</h1>
     <div id="time">00:00:00</div>
     <div class="button-container">
-        <button id="start" onclick="start()">start</button>
-        <button id="stop" onclick="stop()">stop</button>
-        <button id="reset" onclick="reset()">reset</button>
+        <button id="start" onclick="start()">開始</button>
+        <button id="stop" onclick="stop()">停止</button>
+        <button id="reset" onclick="reset()">リセット</button>
         <form action="/test_points" method="POST">
             <button type="submit"><i class="bi bi-plus-circle bs-warning-rgb"></i> 1000ポイント付与</button>
         </form>
         <!--<button id="admin" onclick="reset()">test</button> -->
     </div>
     <div id="points">ポイント: 0</div>
+    <div id="cat-container"></div>
     <input type="hidden" value="{{user_id}}" id="user_id">
 
-
-
-
     <script>
-        let user_id = document.getElementById("user_id").value
+        let user_id = document.getElementById("user_id").value;
         let timer = null;
-        let seconds = 1;
 
         function formatTime(seconds) {
             let hours = Math.floor(seconds / 3600);
@@ -132,17 +150,9 @@
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
-        // 猫画像を表示する
-        function showCat() {
-            const catContainer = document.getElementById('cat-container');
-            const img = document.createElement('img');
-            img.src = `https://natgeo.nikkeibp.co.jp/atcl/web/15/327803/021000043/ph_thumb.jpg/100/100?random=${Math.random()}`;  // ランダムな猫画像
-            img.className = 'cat';
-            catContainer.appendChild(img);  // 猫画像を追加
-        }
-
         function updateTime() {
-            document.getElementById('time').textContent = formatTime(window.sessionStorage.getItem([`Time:${user_id}`]));
+            let time = parseInt(window.sessionStorage.getItem(`Time:${user_id}`)) || 0;
+            document.getElementById('time').textContent = formatTime(time);
         }
 
         function addPoints() {
@@ -155,27 +165,26 @@
         }
 
         function fetchPoints() {
-            fetch('/test_add_points')
+            fetch('/get_points')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('points').textContent = data.points;
+                    console.log(data);
+                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
                 })
                 .catch(error => console.error('ポイントの取得に失敗しました:', error));
         }
 
-
         function start() {
             if (!timer) {
                 timer = setInterval(() => {
-                    const sessionItem = window.sessionStorage.getItem([`Time:${user_id}`])
-                    if (!sessionItem) {
-                        window.sessionStorage.setItem([`Time:${user_id}`], [seconds])
-                    } else {
-                        window.sessionStorage.setItem([`Time:${user_id}`], [seconds + parseInt(sessionItem)])
-                    }
+                    let currentTime = parseInt(window.sessionStorage.getItem(`Time:${user_id}`)) || 0;
+                    currentTime += 1;
+                    window.sessionStorage.setItem(`Time:${user_id}`, currentTime);
                     updateTime();
-                    if (window.sessionStorage.getItem([`Time:${user_id}`]) % 60 === 0 && window.sessionStorage.getItem([`Time:${user_id}`]) !== 0) {
+
+                    if (currentTime % 60 === 0 && currentTime !== 0) {
                         addPoints(); // 1分ごとにポイントを加算
+                        showCat();    // 1分ごとに猫画像を表示
                     }
                 }, 1000);
             }
@@ -188,30 +197,13 @@
 
         function reset() {
             stop();
-            seconds = 1;
-            window.sessionStorage.removeItem([`Time:${user_id}`])
+            window.sessionStorage.removeItem(`Time:${user_id}`);
             updateTime();
+            document.getElementById('cat-container').innerHTML = ''; 
         }
 
-        function test() {
-
-        }
-
-
-        // 初期ポイントを取得して表示
-        function fetchPoints() {
-            fetch('/get_points')
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data)
-                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
-                })
-                .catch(error => console.error('ポイントの取得に失敗しました:', error));
-        }
-
-        // ページ読み込み時にポイントを取得
         window.onload = function () {
-            document.getElementById("time").textContent = formatTime(window.sessionStorage.getItem([`Time:${user_id}`]))
+            updateTime();
             fetchPoints();
         };
     </script>
