@@ -137,7 +137,8 @@
                 })
                 .catch(error => console.error('ポイント取得エラー:', error));
         }
-        
+
+
         function calculatePoints() {
             fetch('/big_reword')  
                 .then(response => response.json())

@@ -101,7 +101,6 @@ def Home():
         big_reword=big_reword_arr, 
         today_points=today_points, 
         total_points=total_points)
-    #return render_template('home/index.html', small_reword=json.dumps(small_reword_arr), big_reword=big_reword_arr, today_points=today_points, total_points=total_points)
 
 def check_date(user_history):
     
@@ -119,13 +118,11 @@ def signup():
         password = request.form.get('password')
         mail_address = request.form.get('mail_address')
 
-        # メールアドレスの重複をチェック
         existing_user = User.query.filter_by(mail_address=mail_address).first()
         if existing_user:
             flash('このメールアドレスは既に登録されています。', 'error')
             return render_template('register_rewords/signup.html', name=username, mail_address=mail_address)
 
-        # 新しいユーザーを作成
         hashed_password = generate_password_hash(password)
         user = User(name=username, mail_address=mail_address, password=hashed_password)
         db.session.add(user)
@@ -138,7 +135,6 @@ def signup():
             flash('登録中にエラーが発生しました。もう一度お試しください。', 'error')
             return render_template('register_rewords/signup.html')
 
-    # GETリクエストの場合、サインアップフォームを表示
     return render_template('register_rewords/signup.html')
 
 
@@ -282,10 +278,10 @@ def add():
     reword_kind = False
     if request.form.get('reword_kind') is not None:
         reword_kind = True
-        points = 0 #random.randrange(1, 2)
+        points = random.randrange(1, 2)
     else:
         reword_kind = False
-        points =  random.randrange(1, 2)
+        points =  random.randrange(3, 4)
     reword_text = request.form['reword']
     user_id = current_user.get_id()
     new_reword = Reword(name=reword_text, reword_kind=reword_kind, user_id=user_id, point=points)
@@ -301,23 +297,18 @@ def stopwatch():
     user_id = current_user.get_id()
     return render_template('register_rewords/stopwatch.html', user_id=user_id)
 
-@app.route('/test_points', methods=['POST'])
-def test_add_points():
-    global points
-    try:
-        points += 1000
-        logger.info(f"ポイントが付与されました。現在のポイント: {points}")
-        flash("1000ポイントを付与しました。", "success")
-    except Exception as e:
-        logger.error(f"ポイント付与中にエラーが発生しました: {e}")
-        flash('ポイントの付与に失敗しました。再度お試しください。', 'danger')
-    finally:
-         return redirect(url_for('Home'))
-    
+@app.route('/GoHome', methods=['POST'])
+def GoHome():
+    # フォームのデータを処理...
+    return redirect(url_for('Home'))  # ホームページにリダイレクト
+
+
+
+
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-    #app.run(debug=True)
+    #app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=True)
 
 
 
@@ -349,3 +340,45 @@ if __name__ == '__main__':
 #test
 #テストコードの追加や修正
 #https://chatgpt.com/c/66ee8ed7-5cf8-8003-b075-50e6fe5e95b0
+
+
+#SELECT name, feature //カラム名
+#   FROM dragon //デーブル名
+#カラム名の変更/ SELECT name AS 'ねぎ', feature AS 'トマト' FROM dragon
+#全カラムを指定/ SELECT * FROM dragon
+#呼吸の一覧を重複なしで取得せよ/ SELECT DISTINCT(kokyu) FROM kimetsu;
+#可愛いが5より大きいキャラの名前と可愛いを取得せよ /SElECT name, kawaii FROM eva WHERE kawaii > 5;
+#可愛いが5より大きいパイロットのレコードを取得せよ/ SELECT * FROM eva WHERE kawaii > 5 AND role ='パイロット';
+#可愛いが5より大きいかパイロットのレコードを取得せよ/ SELECT * FROM eva WHERE kawaii > 5 OR role ='パイロット';
+#可愛いが4~6のキャラのレコードを取得せよ/ SELECT * FROM eva WHERE kawaii VETWEEN 4 AND 6;
+#役職がパイロットか作戦部長のレコードを取得せよ/ SELECT * FROM eva WEHRE kawaii IN ('パイロット', '作戦部長');
+#名前がアから始まるレコードを取得せよ/ SELECT * FROM eva WHERE name LIKE 'ア%'; 曖昧検索
+#rollが空のレコードを取得せよ/ SELECT * FROM eva WHERE name IS NULL;
+#evaテーブルのうち2行だけテーブルを取得せよ/ SELECT * FROM eva LIMIT 2;
+#可愛いの昇順で並び替えよ/ SELECT * FROM eva ORDER BY kawaii;
+#予約語は大文字, 特定の予約語の後は改行する, SELECTで列名を指定するまたはLIMITすればクエリの処理がはやくなる
+#今週の日毎の会員登録者数をよこせ/ SELECT COUNT(name) FROM members WHERE created_day = '2021-01-01';
+#次は昨年の日毎の会員登録者数およこせ/ SELECT created_day(列), COUNT(name) FROM members GROUP BY created_day;
+#次は日毎の会員登録者数をチャンネルごとにだせ/ SELECT created_day, channel, COUNT(name) FROM members GROUP BY created_day, channel;
+#日毎の会員登録者数の平均年齢と最大年齢を出せ/ SELECT created_day, AVG(age), MAX(age) FROM members GROUP BY created_day;
+#平均値を取得/ SELECT AVG(price) FROM items; 
+#平均値以上のアイテムを取得/ SELECT * FROM items WHERE price >= 7000; SELECT * FROM items WHERE price >= 
+# 
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+

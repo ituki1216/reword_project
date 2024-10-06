@@ -130,9 +130,18 @@
         <button id="start" onclick="start()">開始</button>
         <button id="stop" onclick="stop()">停止</button>
         <button id="reset" onclick="reset()">リセット</button>
-        <form action="/test_points" method="POST">
-            <button type="submit"><i class="bi bi-plus-circle bs-warning-rgb"></i> 1000ポイント付与</button>
+        <button id="test_points" onclick="addPoints()">1ポイント追加</button>
+        <!-- <form id="GoHome" action="register_reword/index.htm" method="POST">
+            他のフォームフィールド
+            < <button id="GoHome" type="submit" onclick="redirectToHome(event)">Home</button>
+        </form> --> 
+
+        <form action="/GoHome" method="POST">
+            <!-- 他のフォームフィールド（必要なら追加） -->
+            <button id="GoHome" type="submit">Home</button>
         </form>
+        
+        
         <!--<button id="admin" onclick="reset()">test</button> -->
     </div>
     <div id="points">ポイント: 0</div>
@@ -189,7 +198,20 @@
                 }, 1000);
             }
         }
+        // $(document).ready(function () {
+        //     $('#test_points').on('submit', function (event) {
+        //         event.preventDefault(); // デフォルトの送信を防ぐ
 
+        //         // ポイント付与のリクエストを送信
+        //         $.post('/test_points', function (data) {
+        //             userPoints += 1000; // クライアント側でもポイントを更新
+        //             $('#currentPoints').text(`現在のポイント: ${userPoints}`); // ポイント表示を更新
+        //             $('#message').text(data.message).attr('class', 'success'); // メッセージ表示
+        //         }).fail(function (xhr) {
+        //             $('#message').text('ポイント付与に失敗しました。').attr('class', 'error'); // エラーメッセージ表示
+        //         });
+        //     });
+        // });
         function stop() {
             clearInterval(timer);
             timer = null;
@@ -199,7 +221,7 @@
             stop();
             window.localStorage.removeItem(`Time:${user_id}`);
             updateTime();
-            document.getElementById('cat-container').innerHTML = ''; 
+            document.getElementById('cat-container').innerHTML = '';
         }
 
         window.onload = function () {
