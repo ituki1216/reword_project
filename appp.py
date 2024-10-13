@@ -39,7 +39,7 @@
 
 # @login_manager.user_loader
 # def load_user(user_id):
-#     return User.query.get(int(user_id))
+#     return User.query.get(int(user_id))test
 
 # class User(UserMixin, db.Model):
 #     id = db.Column(db.Integer, primary_key=True, unique=True)
