@@ -24,7 +24,7 @@ app.secret_key = 'timer'
 app.permanent_session_lifetime = timedelta(minutes=60)  # -> 5分 #(days=60) -> 5日保存
 
 
-login_manager.login_message = "おかえりさない！ログインを行ってください。"
+login_manager.login_message = "おかえりさない！ログインを行ってください!"
 
 
 db = SQLAlchemy(app)
@@ -309,6 +309,92 @@ def GoHome():
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     #app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
