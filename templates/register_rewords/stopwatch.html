@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スイーツストップウォッチ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://imgcp.aacdn.jp/img-a/800/auto/aa/gm/article/4/9/3/6/6/8/202402051621/66580000101.jpg');
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            flex-direction: column;
+            backdrop-filter: brightness(0.8);
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            color: #fff0f5;
+            margin-bottom: 20px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #time {
+            font-size: 4em;
+            margin: 20px;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .char1 { color: rgba(144, 238, 144, 0.8); }
+        .char2 { color: rgba(144, 238, 144, 0.8) }
+        .char3 { color: rgba(255, 215, 0, 0.8); }
+        .char4 { color: rgba(255, 215, 0, 0.8);}
+        .char5 { color: rgba(255, 160, 122, 0.8); }
+        .char6 { color: rgba(255, 160, 122, 0.8); }
+        .char7 { color: rgb(187, 60, 187); }
+        button {
+            font-size: 1.2em;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background-color: rgba(255, 182, 193, 0.8);
+            color: #4b0082;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(75, 0, 130, 0.3);
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #cat-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .cat {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #points {
+            font-size: 2em;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background-color: rgba(255, 105, 180, 0.9);
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        button#stop {
+            background-color: rgba(255, 99, 71, 0.8);
+            color: #fff;
+        }
+
+        button#start {
+            background-color: rgba(144, 238, 144, 0.8);
+            color: #4b0082;
+        }
+
+        button#reset {
+            background-color: rgba(255, 215, 0, 0.8);
+            color: #4b0082;
+        }
+
+        form button {
+            background-color: rgba(255, 160, 122, 0.8);
+            color: #4b0082;
+        }
+
+        form button:hover {
+            background-color: rgba(255, 69, 0, 0.9);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>
+        <span class="char1">ス</span>
+        <span class="char2">イ</span>
+        <span class="char3">ー</span>
+        <span class="char4">ツ</span>
+        <span class="char5">ス</span>
+        <span class="char6">ト</span>
+        <span class="char7">ッ</span>
+        <span class="char1">プ</span>
+        <span class="char2">ウ</span>
+        <span class="char3">ォ</span>
+        <span class="char4">ッ</span>
+        <span class="char5">チ</span>
+    </h1>
+    <div id="time">00:00:00</div>
+    <div class="button-container">
+        <button id="start" onclick="start()">開始</button>
+        <button id="stop" onclick="stop()">停止</button>
+        <button id="reset" onclick="reset()">リセット</button>
+        <button id="test_points" onclick="addPoints()">1ポイント追加</button>
+        <!-- <form id="GoHome" action="register_reword/index.htm" method="POST">
+            他のフォームフィールド
+            < <button id="GoHome" type="submit" onclick="redirectToHome(event)">Home</button>
+        </form> --> 
+
+        <form action="/GoHome" method="POST">
+            <!-- 他のフォームフィールド（必要なら追加） -->
+            <button id="GoHome" type="submit">Home</button>
+        </form>
+        
+        
+        <!--<button id="admin" onclick="reset()">test</button> -->
+    </div>
+    <div id="points">ポイント: 0</div>
+    <div id="cat-container"></div>
+    <input type="hidden" value="{{user_id}}" id="user_id">
+
+    <script>
+        let user_id = document.getElementById("user_id").value;
+        let timer = null;
+
+        function formatTime(seconds) {
+            let hours = Math.floor(seconds / 3600);
+            let minutes = Math.floor((seconds % 3600) / 60);
+            let secs = seconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updateTime() {
+            let time = parseInt(window.localStorage.getItem(`Time:${user_id}`)) || 0;
+            document.getElementById('time').textContent = formatTime(time);
+        }
+
+        function addPoints() {
+            fetch('/add_points', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
+                })
+                .catch(error => console.error('ポイントの追加に失敗しました:', error));
+        }
+
+        function fetchPoints() {
+            fetch('/get_points')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.getElementById('points').textContent = `ポイント: ${data.points}`;
+                })
+                .catch(error => console.error('ポイントの取得に失敗しました:', error));
+        }
+
+        function start() {
+            if (!timer) {
+                timer = setInterval(() => {
+                    let currentTime = parseInt(window.localStorage.getItem(`Time:${user_id}`)) || 0;
+                    currentTime += 1;
+                    window.localStorage.setItem(`Time:${user_id}`, currentTime);
+                    updateTime();
+
+                    if (currentTime % 60 === 0 && currentTime !== 0) {
+                        addPoints(); // 1分ごとにポイントを加算
+                        showCat();    // 1分ごとに猫画像を表示
+                    }
+                }, 1000);
+            }
+        }
+        // $(document).ready(function () {
+        //     $('#test_points').on('submit', function (event) {
+        //         event.preventDefault(); // デフォルトの送信を防ぐ
+
+        //         // ポイント付与のリクエストを送信
+        //         $.post('/test_points', function (data) {
+        //             userPoints += 1000; // クライアント側でもポイントを更新
+        //             $('#currentPoints').text(`現在のポイント: ${userPoints}`); // ポイント表示を更新
+        //             $('#message').text(data.message).attr('class', 'success'); // メッセージ表示
+        //         }).fail(function (xhr) {
+        //             $('#message').text('ポイント付与に失敗しました。').attr('class', 'error'); // エラーメッセージ表示
+        //         });
+        //     });
+        // });
+        function stop() {
+            clearInterval(timer);
+            timer = null;
+        }
+
+        function reset() {
+            stop();
+            window.localStorage.removeItem(`Time:${user_id}`);
+            updateTime();
+            document.getElementById('cat-container').innerHTML = '';
+        }
+
+        window.onload = function () {
+            updateTime();
+            fetchPoints();
+        };
+    </script>
+</body>
+
+</html>
