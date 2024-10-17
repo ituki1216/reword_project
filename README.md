@@ -1,0 +1,1 @@
+GitHub ActionsによるCi/CDの構築が完了した
