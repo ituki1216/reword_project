@@ -217,20 +217,6 @@
                 }, 1000);
             }
         }
-        // $(document).ready(function () {
-        //     $('#test_points').on('submit', function (event) {
-        //         event.preventDefault(); // デフォルトの送信を防ぐ
-
-        //         // ポイント付与のリクエストを送信
-        //         $.post('/test_points', function (data) {
-        //             userPoints += 1000; // クライアント側でもポイントを更新
-        //             $('#currentPoints').text(`現在のポイント: ${userPoints}`); // ポイント表示を更新
-        //             $('#message').text(data.message).attr('class', 'success'); // メッセージ表示
-        //         }).fail(function (xhr) {
-        //             $('#message').text('ポイント付与に失敗しました。').attr('class', 'error'); // エラーメッセージ表示
-        //         });
-        //     });
-        // });
         function stop() {
             clearInterval(timer);
             timer = null;
