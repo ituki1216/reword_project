@@ -16,24 +16,14 @@
             --secondary-color: #FFD700; 
             --success-color: #28a745;
             --danger-color: #dc3545;
-            --warning-color: #FFA500;
-            --info-color: #17a2b8;
             --light-color: #fff5f8;
             --dark-color: #343a40;
-            --purple-color: #6f42c1;
-            --teal-color: #20c997;
             --indigo-color: #6610f2;
-            --brown-color: #8B4513;
-            --lime-color: #32CD32;
-            --magenta-color: #FF00FF;
         }
 
         body {
-            background-image: url('https://images.unsplash.com/photo-1589927986089-35812389fc8c?auto=format&fit=crop&w=1350&q=80');
+            background: url('https://images.unsplash.com/photo-1589927986089-35812389fc8c?auto=format&fit=crop&w=1350&q=80') center center fixed;
             background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-attachment: fixed;
             color: var(--dark-color);
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -44,7 +34,7 @@
         .container {
             max-width: 900px;
             margin: 50px auto;
-            background-color: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -68,96 +58,45 @@
             color: var(--secondary-color);
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
         .form-control {
-            background-color: var(--light-color);
+            background: var(--light-color);
             border: 2px solid var(--primary-color);
             color: var(--dark-color);
             border-radius: 10px;
             padding: 12px 20px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .form-control:focus {
-            background-color: #ffffff;
+            background: #ffffff;
             border-color: var(--secondary-color);
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            color: var(--dark-color);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .btn-info {
-            background-color: var(--secondary-color);
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
+            background: var(--secondary-color);
             color: var(--dark-color);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .btn-info:hover {
-            background-color: #e6c200;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            background: #e6c200;
         }
 
         .btn-danger {
-            background-color: var(--danger-color);
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
+            background: var(--danger-color);
             color: #ffffff;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .btn-danger:hover {
-            background-color: #c82333;
-            box-shadow: 0 4px 15px rgba(200, 35, 51, 0.3);
-        }
-
-        .register-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: var(--teal-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .register-link:hover {
-            color: var(--indigo-color);
-            text-decoration: underline;
-        }
-
-        .github-link {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .github-link .btn {
-            background-color: var(--secondary-color);
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 10px;
-            color: var(--dark-color);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .github-link .btn:hover {
-            background-color: #ffb700;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-
-        .alert-container {
-            margin-bottom: 20px;
+            background: #c82333;
         }
 
         .alert {
@@ -167,29 +106,8 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .alert-success {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-            color: #ffffff;
-        }
-
-        .alert-danger {
-            background-color: var(--danger-color);
-            border-color: var(--danger-color);
-            color: #ffffff;
-        }
-
-        .alert-warning {
-            background-color: var(--warning-color);
-            border-color: var(--warning-color);
-            color: #ffffff;
-        }
-
-        .alert-info {
-            background-color: var(--info-color);
-            border-color: var(--info-color);
-            color: #ffffff;
-        }
+        .alert-success { background: var(--success-color); color: #ffffff; }
+        .alert-danger { background: var(--danger-color); color: #ffffff; }
 
         .description {
             padding-left: 20px;
@@ -204,45 +122,20 @@
             font-family: 'Pacifico', cursive;
             font-size: 2rem;
             margin-bottom: 15px;
-            text-shadow: 1px 1px 2px rgba(102, 16, 242, 0.2);
-        }
-
-        .description p {
-            line-height: 1.8;
-        }
-
-        .description .highlight-yellow {
-            color: var(--secondary-color);
-            font-weight: 500;
         }
 
         .description img {
             margin-top: 20px;
             max-width: 100%;
-            height: auto;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         @media (max-width: 768px) {
-            .description {
-                padding-left: 0;
-                border-left: none;
-                margin-top: 20px;
-            }
-
-            .h1-icon {
-                top: -40px;
-                font-size: 40px;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .description h2 {
-                font-size: 1.5rem;
-            }
+            .h1-icon { top: -40px; font-size: 40px; }
+            h1 { font-size: 2rem; }
+            .description { padding-left: 0; border-left: none; margin-top: 20px; }
+            .description h2 { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -252,9 +145,7 @@
         <div class="row">
             <div class="col-md-6 position-relative">
                 <i class="bi bi-gift-fill h1-icon"></i> 
-
                 <h1>ご褒美を追加していきましょう！</h1>
-
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                 <div class="alert-container">
@@ -352,26 +243,6 @@
                 <div class="mt-4">
                     <h5>現在のポイント: <span id="points">0</span></h5>
                 </div>
-
-                <form action="/update" method="POST" class="mt-3">
-                    <div class="form-group">
-                        <label for="update_id">更新したいID:</label>
-                        <input type="text" class="form-control" id="update_id" name="id" placeholder="例: 1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="update_reword">新しいご褒美の名前:</label>
-                        <input type="text" class="form-control" id="update_reword" name="reword" placeholder="例: マカロン" required>
-                    </div>
-                    <button type="submit" class="btn btn-info"><i class="bi bi-pencil-square"></i> 更新</button>
-                </form>
-
-                <form action="/delete" method="POST" class="mt-3">
-                    <div class="form-group">
-                        <label for="delete_id">削除したいID:</label>
-                        <input type="text" class="form-control" id="delete_id" name="id" placeholder="例: 2" required>
-                    </div>
-                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> 削除</button>
-                </form>
             </div>
         </div>
     </div>

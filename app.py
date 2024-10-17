@@ -299,7 +299,6 @@ def stopwatch():
 
 @app.route('/GoHome', methods=['POST'])
 def GoHome():
-    # フォームのデータを処理...
     return redirect(url_for('Home'))  # ホームページにリダイレクト
 
 

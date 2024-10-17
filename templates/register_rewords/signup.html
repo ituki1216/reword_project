@@ -15,238 +15,75 @@
             --success-color: #28a745; 
             --danger-color: #dc3545; 
             --warning-color: #FFA500; 
-            --info-color: #682d07; 
-            --light-color: #f8f9fa; 
             --dark-color: #343a40; 
-            --purple-color: #6f42c1; 
-            --teal-color: #20c997; 
-            --indigo-color: #6610f2; 
-            --pink-color: #FF69B4; 
-            --brown-color: #8B4513; 
-            --lime-color: #32CD32; 
-            --magenta-color: #FF00FF;
+            --light-color: #f8f9fa; 
+            --highlight-blue: #682d07; 
+            --highlight-yellow: #FFD700; 
+            --highlight-green: #28a745; 
+            --highlight-orange: #FFA500; 
+            --highlight-purple: #6f42c1;
         }
 
         body {
-            background-image: url('https://at-living.press/wp-content/uploads/2022/02/20220204_atliving_choco_main-760x507.jpg');
-            background-size: cover; 
-            background-repeat: no-repeat; 
-            background-position: center center; 
-            background-attachment: fixed; 
+            background: url('https://at-living.press/wp-content/uploads/2022/02/20220204_atliving_choco_main-760x507.jpg') center / cover no-repeat fixed; 
             color: var(--dark-color); 
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+            font-family: 'Roboto', sans-serif; 
+            margin: 0; padding: 0; min-height: 100vh;
         }
 
         .container {
-            max-width: 900px;
-            margin: 50px auto;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 900px; margin: 50px auto; background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--primary-color);
-            font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(30, 144, 255, 0.2);
+        h1, .description h2 {
+            text-align: center; color: var(--primary-color); text-shadow: 1px 1px 2px rgba(30, 144, 255, 0.2);
         }
 
-        .alert-container {
-            margin-bottom: 20px;
-        }
+        h1 { margin-bottom: 30px; }
+        .description h2 { margin-bottom: 15px; color: var(--highlight-purple); }
 
-        .alert {
-            border: 1px solid;
-            border-radius: 5px;
-        }
+        .alert-container { margin-bottom: 20px; }
+        .alert { border-radius: 5px; color: #fff; }
+        .alert-success { background-color: var(--success-color); }
+        .alert-danger { background-color: var(--danger-color); }
+        .alert-warning { background-color: var(--warning-color); }
+        
+        label { margin-top: 10px; font-weight: 500; color: var(--dark-color); }
+        .form-control { margin-bottom: 15px; background: var(--light-color); border: 1px solid var(--dark-color); border-radius: 5px; }
+        
+        .form-control:focus { background: #fff; border-color: var(--primary-color); }
+        button[type="submit"] { width: 100%; margin-top: 30px; background: var(--primary-color); border: none; color: #fff; }
 
-        .alert-success {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-            color: #ffffff;
-        }
-
-        .alert-danger {
-            background-color: var(--danger-color);
-            border-color: var(--danger-color);
-            color: #ffffff;
-        }
-
-        .alert-warning {
-            background-color: var(--warning-color);
-            border-color: var(--warning-color);
-            color: #ffffff;
-        }
-
-        .alert-info {
-            background-color: var(--info-color);
-            border-color: var(--info-color);
-            color: #ffffff;
-        }
-
-        label {
-            margin-top: 10px;
-            font-weight: 500;
-            color: var(--dark-color);
-        }
-
-        .form-control {
-            margin-bottom: 15px;
-            background-color: var(--light-color);
-            border: 1px solid var(--dark-color);
-            color: var(--dark-color);
-            border-radius: 5px;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .form-control:focus {
-            background-color: #ffffff;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
-            color: var(--dark-color);
-        }
-
-        button[type="submit"] {
+        button[type="submit"]:hover { background-color: #1c86ee; }
+        .github-link a {
+            display: inline-block;
             width: 100%;
-            margin-top: 15px;
-            background-color: var(--primary-color);
-            border: none;
+            text-align: center;
+            color: #000;
+            background-color: var(--highlight-yellow);
             padding: 10px;
-            font-size: 16px;
-            font-weight: 600;
             border-radius: 5px;
-            color: #ffffff;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #1c86ee;
-            box-shadow: 0 4px 8px rgba(30, 144, 255, 0.3);
-        }
-
-        .register-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: var(--teal-color);
             text-decoration: none;
-            transition: color 0.3s ease;
+            margin-top: 15px; 
         }
+        .github-link a:hover { background-color: #ffd700; }
 
-        .register-link:hover {
-            color: var(--indigo-color);
-            text-decoration: underline;
-        }
+        .register-link { text-align: center; color: var(--highlight-yellow); }
+        .register-link:hover { text-decoration: underline; }
 
-        .github-link {
-            text-align: center;
-            margin-top: 10px;
-        }
+        .description { padding-left: 20px; border-left: 2px solid var(--primary-color); }
+        .description p { line-height: 1.6; }
+        
+        .highlight { font-weight: bold; }
+        .highlight-blue { color: var(--highlight-blue); }
+        .highlight-yellow { color: var(--highlight-yellow); }
+        .highlight-green { color: var(--highlight-green); }
+        .highlight-orange { color: var(--highlight-orange); }
 
-        .github-link .btn {
-            background-color: var(--secondary-color);
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 5px;
-            color: var(--dark-color);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .github-link .btn:hover {
-            background-color: #ffb700;
-            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
-        }
-
-        .description {
-            padding-left: 20px;
-            border-left: 2px solid var(--primary-color);
-            color: var(--dark-color);
-        }
-
-        .description h2 {
-            color: var(--indigo-color);
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-shadow: 1px 1px 2px rgba(102, 16, 242, 0.2);
-        }
-
-        .description p {
-            line-height: 1.6;
-            color: var(--dark-color);
-        }
-
-        .description .highlight-blue {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-yellow {
-            color: var(--secondary-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-green {
-            color: var(--success-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-orange {
-            color: var(--warning-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-purple {
-            color: var(--purple-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-teal {
-            color: var(--teal-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-indigo {
-            color: var(--indigo-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-magenta {
-            color: var(--magenta-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-lime {
-            color: var(--lime-color);
-            font-weight: 500;
-        }
-
-        .description .highlight-brown {
-            color: var(--brown-color);
-            font-weight: 500;
-        }
-
-        .description img {
-            margin-top: 20px;
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+        .description img { margin-top: 20px; max-width: 100%; height: auto; border-radius: 10px; }
 
         @media (max-width: 768px) {
-            .description {
-                padding-left: 0;
-                border-left: none;
-                margin-top: 20px;
-            }
+            .description { padding-left: 0; border-left: none; margin-top: 20px; }
         }
     </style>
 </head>
@@ -287,8 +124,7 @@
                 </form>
 
                 <div class="github-link">
-                    <a href="https://github.com/ituki1216/reword_project
-                    "      class="btn btn-secondary" target="_blank">
+                    <a href="https://github.com/ituki1216/reword_project" target="_blank">
                         <i class="bi bi-github"></i> GitHubリポジトリにアクセス
                     </a>
                 </div>
@@ -297,12 +133,12 @@
             <div class="col-md-6 description">
                 <h2>サイトの説明</h2>
                 <p>
-                    このサイトは、<span class="highlight-blue">勉強時間</span>に応じて
-                    <span class="highlight-yellow">仮想のポイント</span>を取得し、
-                    <span class="highlight-green">ランダムでリワード</span>を得ることができるサイトです。<br>
+                    このサイトは、<span class="highlight highlight-blue">勉強時間</span>に応じて
+                    <span class="highlight highlight-yellow">仮想のポイント</span>を取得し、
+                    <span class="highlight highlight-green">ランダムでリワード</span>を得ることができるサイトです。<br>
                     コンセプトとしては
-                    <span class="highlight-orange">「勉強を楽しく」</span>、
-                    <span class="highlight-purple">「自分にご褒美を与えよう」</span>
+                    <span class="highlight highlight-orange">「勉強を楽しく」</span>、
+                    <span class="highlight highlight-purple">「自分にご褒美を与えよう」</span>
                     です。ぜひご登録ください！
                 </p>
                 <img src="https://storage.aeonshop.com/assets/file/products/img/rc/4582369133910/rc_4582369133910_01.jpg" alt="サイトの説明画像">
